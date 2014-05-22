@@ -13,7 +13,7 @@ Sample usage (all commands from src/KevinScript directory):
     >main.py tests/hello_world.k
     Hello, World!
 
-    >main.py tests/prime_detecter.k
+    >main.py tests/prime_detector.k
     Prime numbers below 100:
     2
     3
