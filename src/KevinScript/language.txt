@@ -1,4 +1,3 @@
-#proposed nonworking grammar
 _ -> StatementList
 
 StatementList -> Statement | Statement StatementList
