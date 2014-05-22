@@ -1,0 +1,51 @@
+#proposed nonworking grammar
+_ -> StatementList
+
+StatementList -> Statement | Statement StatementList
+
+Statement -> PrintStatement
+Statement -> AssignmentStatement
+Statement -> WhileStatement
+Statement -> ForStatement
+Statement -> IfStatement
+Statement -> FunctionDeclarationStatement
+Statement -> ExpressionStatement
+Statement -> ReturnStatement
+Statement -> EmptyStatement
+
+PrintStatement -> print Expression ;
+AssignmentStatement -> identifier = Expression ; | AttributeRef = Expression ;
+WhileStatement -> while ( Expression ) { StatementList }
+ForStatement -> for ( identifier in Expression ) { StatementList }
+IfStatement -> if ( Expression ) { StatementList }
+IfStatement -> if ( Expression ) { StatementList } else { StatementList }
+FunctionDeclarationStatement -> function identifier ( ) { StatementList }
+FunctionDeclarationStatement -> function identifier ( FunctionDeclarationArgumentList ) { StatementList }
+ExpressionStatement -> Expression ;
+ReturnStatement -> return Expression ;
+EmptyStatement -> ;
+
+Atom -> identifier | Literal | Enclosure
+Literal -> number | string_literal
+Enclosure -> ( Expression ) | ListDisplay | DictDisplay
+Primary -> Atom | Call | AttributeRef
+Call -> Primary ( ExpressionList ) | Primary ( )
+AttributeRef -> Primary . identifier
+
+ListDisplay -> [ ] | [ ExpressionList ]
+DictDisplay -> { } | { KeyValueList }
+KeyValueList -> KeyValuePair | KeyValuePair , KeyValueList
+KeyValuePair -> Expression : Expression
+
+#operator precedence: [* / %], [+ -], [!= == > <]
+MultExpression -> Primary | MultExpression mult_operator Primary
+AddExpression -> MultExpression | AddExpression add_operator MultExpression
+CompExpression -> AddExpression | CompExpression comp_operator AddExpression
+Expression -> CompExpression | FunctionDeclaration
+
+#function declaration style that may be used within an expression.
+#not to be confused with FunctionDeclarationStatement, which cannot.
+FunctionDeclaration -> function( FunctionDeclarationArgumentList ) { StatementList } | function() { StatementList }
+FunctionDeclarationArgumentList -> identifier | identifier , FunctionDeclarationArgumentList
+
+ExpressionList -> Expression | Expression , ExpressionList
