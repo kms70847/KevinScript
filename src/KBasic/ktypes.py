@@ -191,7 +191,8 @@ class KList(KObject):
         self.items = items if items != None else []
         self.attributes["size"] = PyFunction(lambda scopes: KInt(len(self.items)))
         self.attributes["at"] = PyFunction(lambda scopes, idx: self.items[idx.value])
-        
+        #not implemented yet: append, pop, slice, etc
+
     def repr(self):
         return KString("[" + ", ".join(item.repr().value for item in self.items) + "]")
     def bool(self):
@@ -207,4 +208,5 @@ class KDict(KObject):
         self.data = data if data != None else {}
         self.attributes["at"] = PyFunction(lambda scopes, key: self.at(key))
     def at(self, obj):
+        #not implemented yet
         pass
