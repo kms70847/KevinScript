@@ -18,7 +18,7 @@ def evaluate(node, scopes):
         for scope in scopes[::-1]:
             if name in scope:
                 return scope[name]
-        return None
+        raise Exception("Unrecognized name \"{}\"".format(name))
 
     def line(node):
         if isinstance(node, ast.Leaf):
