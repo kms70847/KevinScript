@@ -83,4 +83,10 @@ True;
 False;
 object();
 
+"attribute access";
+foo = object();
+foo.bar = 23;
+foo.troz = function(){return 23;};
+foo.troz();
+
 print "all tests passed!";
