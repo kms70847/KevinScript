@@ -16,6 +16,7 @@ tree = ast.construct_ast("tokens.txt", "language.txt", sys.argv[1], reducible_no
 scopes = [{}]
 #populate built in types and functions
 scopes[0]["object"] = PyFunction(lambda scopes: KObject())
+scopes[0]["hash"] = PyFunction(lambda scopes, item: item.hash())
 scopes[0]["True"] = KTrue
 scopes[0]["False"] = KFalse
 evaluate(tree, scopes)
