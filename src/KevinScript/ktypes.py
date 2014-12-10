@@ -191,7 +191,13 @@ class KList(KObject):
         self.items = items if items != None else []
         self.attributes["size"] = PyFunction(lambda scopes: KInt(len(self.items)))
         self.attributes["at"] = PyFunction(lambda scopes, idx: self.items[idx.value])
-        #not implemented yet: append, pop, slice, etc
+        self.attributes["append"] = PyFunction(lambda scopes, item: self.append(item))
+        self.attributes["pop"] = PyFunction(lambda scopes: self.pop())
+
+    def append(self, item):
+        self.items.append(item)
+    def pop(self):
+        return self.items.pop()
 
     def repr(self):
         return KString("[" + ", ".join(item.repr().value for item in self.items) + "]")
