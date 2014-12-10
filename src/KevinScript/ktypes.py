@@ -33,7 +33,7 @@ class KObject:
     def repr(self):
         return KString("<{} instance at {}>".format(self.name, hex(id(self))))
     def hash(self):
-        return KInt(hash(self.id))
+        return KInt(hash(id(self)))
     def add(self, other):
         return self
 
