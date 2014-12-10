@@ -55,6 +55,11 @@ troz(23, 42);
 "list displays";
 [];
 [4, 8, 15, 16, 23, 42];
+"list methods";
+l = [];
+l.append(23);
+l.at(0);
+l.pop();
 
 "dict displays";
 print "dict displays are not implemented yet";
