@@ -22,8 +22,12 @@ class KObject:
             stripped_name = name[2:-2]
             if stripped_name in names and hasattr(self, stripped_name):
                 return PyFunction(lambda scopes, other: getattr(self, stripped_name)(other))
-
-        raise Exception("no attribute {} found for {} object".format(name, self.attributes["type"].name))
+        
+        #most objects report their type, but some don't (namely, base Objects don't).
+        #This is because the type attribute is usually set in the __init__ method, but the ObjectType object doesn't exist when we initialize Objects for the first time.
+        #This is a rather tricky dependency problem. Maybe implenting properties would help?
+        type_name = self.attributes["type"].name if "type" in self.attributes else "unknown"
+        raise Exception("no attribute {} found for {} object".format(name, type_name))
     def bool(self):
         return KTrue
     def repr(self):
