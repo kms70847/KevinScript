@@ -1,5 +1,5 @@
 import ast
-from ktypes import Function, KObject, KInt, KBool, KString, KList
+from ktypes import Function, KObject, KInt, KBool, KString, KList, KNone
 
 def extract_identifiers(node):
     if isinstance(node, ast.Leaf):
@@ -26,7 +26,7 @@ def evaluate(node, scopes):
         else:
             return line(node.children[0])
 
-    statement_default_return_value = {"returning": False, "value": None}
+    statement_default_return_value = {"returning": False, "value": KNone}
 
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "number":
