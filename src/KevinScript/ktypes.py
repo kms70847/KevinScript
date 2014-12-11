@@ -64,6 +64,7 @@ DictType = KType("dict")
 
 #singleton None object. Required for defining the attributes of ObjectType.
 KNone = KObject()
+KNone.repr = lambda: KString("None")
 KNone.attributes["type"] = NoneType
 
 #type attributes
