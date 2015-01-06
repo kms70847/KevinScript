@@ -6,7 +6,7 @@
 
 from primitives import *
 from parseRules import parseRules
-from prettyprint import dictPrint
+from prettyprint import dict_print
 
 
 def multiDict(seq, keyFunc):
@@ -167,4 +167,4 @@ class ParseTable:
         return ret
         
     def __repr__(self):
-        return dictPrint(self.actionTable()) + "\n" + dictPrint(self.gotoTable())
+        return dict_print(self.actionTable()) + "\n" + dict_print(self.gotoTable())

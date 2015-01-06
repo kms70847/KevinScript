@@ -7,7 +7,7 @@
 from primitives import *
 from parseRules import parseRules
 from followset import followSets
-from prettyprint import dictPrint
+from prettyprint import dict_print
 
 def multiDict(seq, keyFunc):
     ret = {}
@@ -174,7 +174,7 @@ class ParseTable:
         return ret
     
     def __repr__(self):
-        return dictPrint(self.actionTable()) + "\n" + dictPrint(self.gotoTable())
+        return dict_print(self.actionTable()) + "\n" + dict_print(self.gotoTable())
 
 def reduceMustBeAdded(reduceNumber, actionSymbol, rules, follow):
     ruleSymbol = rules[reduceNumber].LHS
