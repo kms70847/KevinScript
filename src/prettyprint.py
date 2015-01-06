@@ -25,9 +25,9 @@ def _pad(x, width):
         x = " " + x
     return x
 
-#like regular join, but the seperator goes on the ends too.
-def _enclosed_join(seperator, seq):
-    return seperator + seperator.join(seq) + seperator
+#like regular join, but the separator goes on the ends too.
+def _enclosed_join(separator, seq):
+    return separator + separator.join(seq) + separator
 
 #prints a sequence of items, each one _padded according to its given width.
 def _row_print(row, widths):
@@ -40,8 +40,8 @@ def _max_width(grid, column):
 #returns a printable grid representation
 def grid_print(grid):
     widths = [_max_width(grid, x) for x in range(len(grid[0]))]
-    rowSeperator = "\n" + _enclosed_join("+",map(lambda x: "-" * x, widths)) + "\n"
-    return _enclosed_join(rowSeperator, [_row_print(row, widths) for row in grid])
+    rowSeparator = "\n" + _enclosed_join("+",map(lambda x: "-" * x, widths)) + "\n"
+    return _enclosed_join(rowSeparator, [_row_print(row, widths) for row in grid])
 
 #like map, but for 2d arrays.
 def _grid_map(func, grid):
