@@ -35,11 +35,7 @@ def row_print(row, widths):
 
 #finds the widest element in one column of a grid
 def max_width(grid, column):
-    max = 0
-    for row in grid:
-        if len(row[column]) > max:
-            max = len(row[column])
-    return max
+    return max(len(row[column]) for row in grid)
 
 #returns a printable grid representation
 def grid_print(grid):
