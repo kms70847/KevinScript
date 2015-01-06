@@ -40,8 +40,8 @@ def _max_width(grid, column):
 #returns a printable grid representation
 def grid_print(grid):
     widths = [_max_width(grid, x) for x in range(len(grid[0]))]
-    rowSeparator = "\n" + _enclosed_join("+",map(lambda x: "-" * x, widths)) + "\n"
-    return _enclosed_join(rowSeparator, [_row_print(row, widths) for row in grid])
+    row_separator = "\n" + _enclosed_join("+",map(lambda x: "-" * x, widths)) + "\n"
+    return _enclosed_join(row_separator, [_row_print(row, widths) for row in grid])
 
 #like map, but for 2d arrays.
 def _grid_map(func, grid):
@@ -52,16 +52,16 @@ def _grid_map(func, grid):
 #ex. In the sample grid at the top of this page,
 #0-6, $, (, ) are keys, and s1, r2, etc are values.
 def _grid_from_dict(d):
-    firstKeys = list(set(map(lambda x: x[0], d)))
-    secondKeys = list(set(map(lambda x: x[1], d)))
-    firstKeys.sort()
-    secondKeys.sort()
+    first_keys = list(set(map(lambda x: x[0], d)))
+    second_keys = list(set(map(lambda x: x[1], d)))
+    first_keys.sort()
+    second_keys.sort()
     ret = [["X"]]
-    for k2 in secondKeys:
+    for k2 in second_keys:
         ret[0].append(k2)
-    for k1 in firstKeys:
+    for k1 in first_keys:
         row = [k1]
-        for k2 in secondKeys:
+        for k2 in second_keys:
             key = (k1, k2)
             row.append(d.get(key, ""))
         ret.append(row)
