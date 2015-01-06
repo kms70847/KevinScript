@@ -20,38 +20,38 @@
 """
 
 #adds spaces before string x until it is `width` characters long
-def pad(x, width):
+def _pad(x, width):
     while len(x) < width:
         x = " " + x
     return x
 
 #like regular join, but the seperator goes on the ends too.
-def enclosed_join(seperator, seq):
+def _enclosed_join(seperator, seq):
     return seperator + seperator.join(seq) + seperator
 
-#prints a sequence of items, each one padded according to its given width.
-def row_print(row, widths):
-    return enclosed_join("|",map(lambda x: pad(x[0], x[1]), zip(row, widths)))
+#prints a sequence of items, each one _padded according to its given width.
+def _row_print(row, widths):
+    return _enclosed_join("|",map(lambda x: _pad(x[0], x[1]), zip(row, widths)))
 
 #finds the widest element in one column of a grid
-def max_width(grid, column):
+def _max_width(grid, column):
     return max(len(row[column]) for row in grid)
 
 #returns a printable grid representation
 def grid_print(grid):
-    widths = [max_width(grid, x) for x in range(len(grid[0]))]
-    rowSeperator = "\n" + enclosed_join("+",map(lambda x: "-" * x, widths)) + "\n"
-    return enclosed_join(rowSeperator, [row_print(row, widths) for row in grid])
+    widths = [_max_width(grid, x) for x in range(len(grid[0]))]
+    rowSeperator = "\n" + _enclosed_join("+",map(lambda x: "-" * x, widths)) + "\n"
+    return _enclosed_join(rowSeperator, [_row_print(row, widths) for row in grid])
 
 #like map, but for 2d arrays.
-def grid_map(func, grid):
+def _grid_map(func, grid):
     return map(lambda x: map(func, x), grid)
 
 #given a dict `d`, whose keys are 2 element tuples,
 #makes a grid with the keys as axes and the values as interior values.
 #ex. In the sample grid at the top of this page,
 #0-6, $, (, ) are keys, and s1, r2, etc are values.
-def grid_from_dict(d):
+def _grid_from_dict(d):
     firstKeys = list(set(map(lambda x: x[0], d)))
     secondKeys = list(set(map(lambda x: x[1], d)))
     firstKeys.sort()
@@ -65,10 +65,10 @@ def grid_from_dict(d):
             key = (k1, k2)
             row.append(d.get(key, ""))
         ret.append(row)
-    return grid_map(str, ret)
+    return _grid_map(str, ret)
 
 #returns a printable representation of the dict, rendered as a grid.
 def dict_print(d):
-    l = grid_from_dict(d)
-    l = grid_map(lambda x: " " + x + " ", l)
+    l = _grid_from_dict(d)
+    l = _grid_map(lambda x: " " + x + " ", l)
     return grid_print(l)
