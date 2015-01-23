@@ -1,27 +1,27 @@
-from util import constructParser
-from parseRules import parseRules
+from util import construct_parser
+from parseRules import parse_rules
 from lex import lex, gen_token_rules, LiteralTokenRule
 
 
 def slurp(filename):
     file = open(filename)
-    rulesText = file.read()
+    rules_text = file.read()
     file.close()
-    return rulesText
+    return rules_text
 
 
-def tokenizeProgram(data):
+def tokenize_program(data):
     lines = data.split("\n")
     # remove comments
     lines = [line.partition("#")[0] for line in lines]
     characters = []
-    inString = False
+    in_string = False
     for char in "".join(lines):
         if char == "\"":
-            inString = not inString
-        if char == " " and not inString:
+            in_string = not in_string
+        if char == " " and not in_string:
             continue
-        if char == "\t" and not inString:
+        if char == "\t" and not in_string:
             continue
         characters.append(char)
     return "".join(characters)
@@ -59,12 +59,12 @@ def construct_parse_tree(right_derivation, rules, tokens):
     rule = rules[right_derivation.pop()]
     children = []
     for symbol in rule.RHS[::-1]:
-        if symbol.symbolType == "Terminal":
+        if symbol.symbol_type == "Terminal":
             children.append(Leaf(tokens.pop()))
-        elif symbol.symbolType == "NonTerminal":
+        elif symbol.symbol_type == "NonTerminal":
             children.append(construct_parse_tree(right_derivation, rules, tokens))
         else:
-            raise Exception("unexpected symbol type {}".format(symbol.symbolType))
+            raise Exception("unexpected symbol type {}".format(symbol.symbol_type))
     children = children[::-1]
     ret = Node(rule.LHS.value)
     ret.children = children
@@ -102,12 +102,12 @@ def construct_parse_tree(right_derivation, rules, tokens):
         rule = rules[right_derivation.pop()]
         node = first_unfinished_node(tree)
         for symbol in rule.RHS[::-1]:
-            if symbol.symbolType == "Terminal":
+            if symbol.symbol_type == "Terminal":
                 node.children.insert(0, Leaf(None))
-            elif symbol.symbolType == "NonTerminal":
+            elif symbol.symbol_type == "NonTerminal":
                 node.children.insert(0, Node(symbol.value))
             else:
-                raise Exception("unexpected symbol type {}".format(symbol.symbolType))
+                raise Exception("unexpected symbol type {}".format(symbol.symbol_type))
 
     # second pass: assign token values to leaves
     for node in iter_tree(tree):
@@ -141,12 +141,12 @@ def construct_parse_tree_v3(right_derivation, rules, tokens):
         rule = rules[right_derivation.pop()]
         node = unfinished_nodes.pop()
         for symbol in rule.RHS[::-1]:
-            if symbol.symbolType == "Terminal":
+            if symbol.symbol_type == "Terminal":
                 node.children.insert(0, Leaf(None))
-            elif symbol.symbolType == "NonTerminal":
+            elif symbol.symbol_type == "NonTerminal":
                 node.children.insert(0, Node(symbol.value))
             else:
-                raise Exception("unexpected symbol type {}".format(symbol.symbolType))
+                raise Exception("unexpected symbol type {}".format(symbol.symbol_type))
         unfinished_nodes.extend([child for child in node.children if not is_leaf(child)])
 
     # second pass: assign token values to leaves
@@ -208,11 +208,11 @@ def construct_ast(tokens_filename, rules_filename, program_filename, reducible_n
     """
     if not reducible_node_names:
         reducible_node_names = []
-    rulesText = slurp(rules_filename)
-    rules = parseRules(rulesText)
+    rules_text = slurp(rules_filename)
+    rules = parse_rules(rules_text)
 
-    lexText = slurp(tokens_filename)
-    token_rules = gen_token_rules(lexText, rules)
+    lex_text = slurp(tokens_filename)
+    token_rules = gen_token_rules(lex_text, rules)
 
     program_text = slurp(program_filename)
     tokens = lex(program_text, token_rules)
@@ -220,7 +220,7 @@ def construct_ast(tokens_filename, rules_filename, program_filename, reducible_n
     # todo: this kind of post-lexing processing should be specified by the caller somehow.
     tokens = [token for token in tokens if token.klass.name != "whitespace"]
 
-    parser = constructParser(rulesText)
+    parser = construct_parser(rules_text)
     right_derivation = parser.parse(tokens)
 
     parse_tree = construct_parse_tree_v3(right_derivation, rules, tokens)

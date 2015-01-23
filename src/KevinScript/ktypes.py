@@ -95,7 +95,7 @@ TypeType.attributes["type"] = TypeType
 TypeType.attributes["parent"] = ObjectType
 
 # Like NoneType, functions can't be instantiated from FunctionType.
-# It's just here so type(myFunction) has a coherent result.
+# It's just here so type(my_function) has a coherent result.
 FunctionType.attributes["type"] = TypeType
 FunctionType.attributes["parent"] = ObjectType
 
@@ -119,11 +119,11 @@ class Function(KObject):
         self.arguments = arguments
         self.statements = statements
 
-    def eval(self, scopes, argumentValues):
+    def eval(self, scopes, argument_values):
         locals = {}
         for i in range(len(self.arguments)):
             name = self.arguments[i]
-            value = argumentValues[i]
+            value = argument_values[i]
             locals[name] = value
         return eval_ast.evaluate(self.statements, self.closure + [locals])["value"]
 
@@ -138,8 +138,8 @@ class PyFunction(Function):
         self.attributes["__call__"] = self
         self.func = func
 
-    def eval(self, scopes, argumentValues):
-        return self.func(scopes, *argumentValues)
+    def eval(self, scopes, argument_values):
+        return self.func(scopes, *argument_values)
 
 
 class KBool(KObject):

@@ -10,7 +10,7 @@ end_of_input_token = Token(LiteralTokenRule("$"), "$")
 
 # rules is a list of Rule objects.
 # actions is a dict whose key is a tuple of state and input symbol (int and string), and whose value is an Action object.
-# gotos is a dict whose key is a tuple of state(int) and nonTerminal, and whose value is a state(int).
+# gotos is a dict whose key is a tuple of state(int) and non_terminal, and whose value is a state(int).
 class LRParser:
     def __init__(self, rules, actions, gotos):
         self.rules = rules
@@ -25,12 +25,12 @@ class LRParser:
         self.input = input + [end_of_input_token]
         self.output = []
         while True:
-            actionKey = (self.stack[-1], self.input[0].klass.name)
+            action_key = (self.stack[-1], self.input[0].klass.name)
 
             # no action: syntax error is reported
-            if actionKey not in self.actions:
+            if action_key not in self.actions:
                 raise Exception("couldn't parse string - no action found for {}".format(self.input[0]))
-            action = self.actions[actionKey]
+            action = self.actions[action_key]
 
             # an accept: string is accepted
             if action.action == accept:
@@ -50,10 +50,10 @@ class LRParser:
             # a new state is looked up in the goto table and made the new current state by pushing it onto the stack.
             if action.action == reduce:
                 self.output.append(action.destination)
-                ruleIdx = action.destination
-                amtToPop = len(self.rules[ruleIdx].RHS)
-                self.stack = self.stack[0:-amtToPop]
-                gotoKey = (self.stack[-1], self.rules[ruleIdx].LHS)
-                if gotoKey not in self.gotos:
+                rule_idx = action.destination
+                amt_to_pop = len(self.rules[rule_idx].RHS)
+                self.stack = self.stack[0:-amt_to_pop]
+                goto_key = (self.stack[-1], self.rules[rule_idx].LHS)
+                if goto_key not in self.gotos:
                     raise Exception("couldn't parse string - no goto found")
-                self.stack.append(self.gotos[gotoKey])
+                self.stack.append(self.gotos[goto_key])

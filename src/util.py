@@ -1,15 +1,15 @@
-from parseRules import parseRules
+from parseRules import parse_rules
 from SLRtable import ParseTable
 from LRParser import LRParser
 
 
-def constructParser(rulesText, isVerbose=False):
+def construct_parser(rules_text, is_verbose=False):
     def log(msg=""):
-        if isVerbose:
+        if is_verbose:
             print msg
 
     log("Parsing rules...")
-    rules = parseRules(rulesText)
+    rules = parse_rules(rules_text)
     log("\n".join(map(str, rules)))
     log()
 
@@ -17,17 +17,17 @@ def constructParser(rulesText, isVerbose=False):
     table = ParseTable(rules)
     log(table)
 
-    parser = LRParser(rules, table.actionTable(), table.gotoTable())
+    parser = LRParser(rules, table.action_table(), table.goto_table())
     return parser
 
 
 # returns True if the program is valid, False otherwise
-def isValid(rulesText, programText):
-    rules = parseRules(rulesText)
+def is_valid(rules_text, program_text):
+    rules = parse_rules(rules_text)
     table = ParseTable(rules)
-    parser = LRParser(rules, table.actionTable(), table.gotoTable())
+    parser = LRParser(rules, table.action_table(), table.goto_table())
     try:
-        derivation = parser.parse(programText)
+        derivation = parser.parse(program_text)
     except:
         return False
     return True

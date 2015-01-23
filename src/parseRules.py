@@ -12,27 +12,27 @@ Binary -> 1"""
 from primitives import *
 
 
-def parseRules(ruleText):
+def parse_rules(rule_text):
     ret = []
-    lines = ruleText.split("\n")
+    lines = rule_text.split("\n")
     # remove comments and trailing whitespace
     lines = [line.partition("#")[0].strip() for line in lines]
     # filter out empty lines
     lines = [line for line in lines if len(line) > 1]
     # expand lines of the form "A -> B | C" into two lines, "A -> B" and "A -> C"
-    expandedLines = []
+    expanded_lines = []
     for line in lines:
         if "|" in line:
             LHS, RHSs = line.split("->")
             for RHS in RHSs.split("|"):
                 RHS = RHS.strip()
-                expandedLines.append(LHS + "->" + RHS)
+                expanded_lines.append(LHS + "->" + RHS)
         else:
-            expandedLines.append(line)
-    lines = expandedLines
+            expanded_lines.append(line)
+    lines = expanded_lines
 
-    nonTerminalSymbols = set(map(lambda x: x.split("->")[0].strip(), lines))
-    if "_" not in nonTerminalSymbols:
+    non_terminal_symbols = set(map(lambda x: x.split("->")[0].strip(), lines))
+    if "_" not in non_terminal_symbols:
         print "Warning, expected starting Symbol _"
     for line in lines:
         line = line.split("->")
@@ -41,7 +41,7 @@ def parseRules(ruleText):
         for token in line[1].split():
             if token == "%SPACE%":
                 token = " "
-            if token in nonTerminalSymbols:
+            if token in non_terminal_symbols:
                 RHS.append(NonTerminal(token))
             else:
                 RHS.append(Terminal(token))

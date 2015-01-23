@@ -3,7 +3,7 @@
 
 # a nonterminal is a symbol in a grammar that does expand into additional symbols.
 class NonTerminal:
-    symbolType = "NonTerminal"
+    symbol_type = "NonTerminal"
 
     def __init__(self, value):
         self.value = value
@@ -11,10 +11,10 @@ class NonTerminal:
     def __eq__(self, other):
         if other is None:
             return False
-        return self.symbolType == other.symbolType and self.value == other.value
+        return self.symbol_type == other.symbol_type and self.value == other.value
 
     def __hash__(self):
-        return hash((self.value, self.symbolType))
+        return hash((self.value, self.symbol_type))
 
     def __repr__(self):
         return str(self.value)
@@ -22,7 +22,7 @@ class NonTerminal:
 
 # a terminal is a symbol used in a grammar that doesn't expand into additional symbols. Typically character literals.
 class Terminal:
-    symbolType = "Terminal"
+    symbol_type = "Terminal"
 
     def __init__(self, value):
         self.value = value
@@ -30,10 +30,10 @@ class Terminal:
     def __eq__(self, other):
         if other is None:
             return False
-        return self.symbolType == other.symbolType and self.value == other.value
+        return self.symbol_type == other.symbol_type and self.value == other.value
 
     def __hash__(self):
-        return hash((self.value, self.symbolType))
+        return hash((self.value, self.symbol_type))
 
     def __repr__(self):
         return str(self.value)
@@ -42,7 +42,7 @@ class Terminal:
 # a rule is a NonTerminal left hand side and a right hand side with one or more symbols (can be either terminals or nonterminals or both)
 class Rule:
     def __init__(self, LHS, RHS):
-        if LHS.symbolType != NonTerminal.symbolType:
+        if LHS.symbol_type != NonTerminal.symbol_type:
             raise Error("Expected terminal symbol")
         self.LHS = LHS
         self.RHS = RHS
@@ -61,41 +61,41 @@ class Rule:
 # See http://en.wikipedia.org/wiki/LR_parser#Constructing_LR.280.29_parsing_tables
 # primarily used in SLRtable.py and table.py
 class Item:
-    def __init__(self, rule, markPos=0):
+    def __init__(self, rule, mark_pos=0):
         self.rule = rule
-        self.markPos = markPos
+        self.mark_pos = mark_pos
 
-    def markedSymbol(self):
-        if self.markPos >= len(self.rule.RHS):
+    def marked_symbol(self):
+        if self.mark_pos >= len(self.rule.RHS):
             return None
-        return self.rule.RHS[self.markPos]
+        return self.rule.RHS[self.mark_pos]
 
-    def advanceMarker(self):
-        self.markPos += 1
+    def advance_marker(self):
+        self.mark_pos += 1
 
     def copy(self):
-        return Item(self.rule, self.markPos)
+        return Item(self.rule, self.mark_pos)
 
     def terminating(self):
-        return self.markedSymbol() is None
+        return self.marked_symbol() is None
 
-    def matchesRule(self, rule):
+    def matches_rule(self, rule):
         return self.rule == rule
 
     def __eq__(self, other):
-        return self.rule == other.rule and self.markPos == other.markPos
+        return self.rule == other.rule and self.mark_pos == other.mark_pos
 
     def __hash__(self):
-        return hash((self.rule, self.markPos))
+        return hash((self.rule, self.mark_pos))
 
     def __repr__(self):
         ret = str(self.rule.LHS) + " -> "
         RHS = []
         for idx, symbol in enumerate(self.rule.RHS):
-            if idx == self.markPos:
+            if idx == self.mark_pos:
                 RHS.append(".")
             RHS.append(str(symbol))
-        if self.markPos == len(self.rule.RHS):
+        if self.mark_pos == len(self.rule.RHS):
             RHS.append(".")
         ret = ret + " ".join(RHS)
         return ret

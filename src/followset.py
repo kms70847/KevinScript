@@ -6,64 +6,64 @@
 # (looking back on this a year later, I'm confused about how the followset for a left derivation parser can be used in my right derivation parser.)
 
 from primitives import *
-from parseRules import parseRules
+from parseRules import parse_rules
 
 
-def setsSize(dictOfSets):
+def sets_size(dict_of_sets):
     total = 0
-    for key in dictOfSets:
-        total += len(dictOfSets[key])
+    for key in dict_of_sets:
+        total += len(dict_of_sets[key])
     return total
 
 
 # this needs revision if we decide to allow languages that use epsilon
-def firstSets(rules):
-    firstRHS = {}
-    firstLHS = {}
+def first_sets(rules):
+    first_r_h_s = {}
+    first_l_h_s = {}
     # initialize all the things to empty sets
     for rule in rules:
-        firstLHS[rule.LHS] = set()
-        firstRHS[tuple(rule.RHS)] = set()
+        first_l_h_s[rule.LHS] = set()
+        first_r_h_s[tuple(rule.RHS)] = set()
         # terminals have only themselves as a first set
         for symbol in rule.RHS:
-            if symbol.symbolType == Terminal.symbolType:
-                firstLHS[symbol] = set([symbol])
-    oldRetSize = setsSize(firstLHS)
+            if symbol.symbol_type == Terminal.symbol_type:
+                first_l_h_s[symbol] = set([symbol])
+    old_ret_size = sets_size(first_l_h_s)
     while True:
         for rule in rules:
             Ai = rule.LHS
             wi = tuple(rule.RHS)
 
-            if wi[0].symbolType == Terminal.symbolType:
-                firstRHS[wi].add(wi[0])
+            if wi[0].symbol_type == Terminal.symbol_type:
+                first_r_h_s[wi].add(wi[0])
             else:
-                firstRHS[wi] = firstRHS[wi].union(firstLHS[wi[0]])
+                first_r_h_s[wi] = first_r_h_s[wi].union(first_l_h_s[wi[0]])
 
-            firstLHS[Ai] = firstLHS[Ai].union(firstRHS[wi])
-        size = setsSize(firstLHS)
-        if size == oldRetSize:
-            return firstLHS
-        oldRetSize = size
+            first_l_h_s[Ai] = first_l_h_s[Ai].union(first_r_h_s[wi])
+        size = sets_size(first_l_h_s)
+        if size == old_ret_size:
+            return first_l_h_s
+        old_ret_size = size
 
 
-def followSets(rules):
-    first = firstSets(rules)
+def follow_sets(rules):
+    first = first_sets(rules)
     follow = {}
     for rule in rules:
         follow[rule.LHS] = set()
         for symbol in rule.RHS:
             follow[symbol] = set()
     follow[rules[0].LHS].add(Terminal("$"))
-    oldRetSize = setsSize(follow)
+    old_ret_size = sets_size(follow)
     while True:
         for rule in rules:
             for idx, symbol in enumerate(rule.RHS):
                 if idx == len(rule.RHS) - 1:
                     follow[symbol] = follow[symbol].union(follow[rule.LHS])
                 else:
-                    nextSymbol = rule.RHS[idx+1]
-                    follow[symbol] = follow[symbol].union(first[nextSymbol])
-        size = setsSize(follow)
-        if size == oldRetSize:
+                    next_symbol = rule.RHS[idx+1]
+                    follow[symbol] = follow[symbol].union(first[next_symbol])
+        size = sets_size(follow)
+        if size == old_ret_size:
             return follow
-        oldRetSize = size
+        old_ret_size = size

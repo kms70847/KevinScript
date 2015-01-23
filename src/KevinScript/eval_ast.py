@@ -16,7 +16,7 @@ def extract_identifiers(node):
 
 
 def evaluate(node, scopes):
-    def getVar(name):
+    def get_var(name):
         for scope in scopes[::-1]:
             if name in scope:
                 return scope[name]
@@ -34,7 +34,7 @@ def evaluate(node, scopes):
         if node.token.klass.name == "number":
             return KInt(int(node.token.value))
         elif node.token.klass.name == "identifier":
-            return getVar(node.token.value)
+            return get_var(node.token.value)
         elif node.token.klass.name == "string_literal":
             return KString(node.token.value[1:-1])
         else:
@@ -46,7 +46,7 @@ def evaluate(node, scopes):
 
         # statements.
         # when evaluated, all statements should return one of two values:
-        # {"returning": True, "value": returnValue} - when a `Return` statement was executed, and we need to move back up to the most recent function call
+        # {"returning": True, "value": return_value} - when a `Return` statement was executed, and we need to move back up to the most recent function call
         # `statement_default_return_value` - when no return statement has been executed.
         if node.klass == "Statement":
             result = evaluate(node.children[0], scopes)

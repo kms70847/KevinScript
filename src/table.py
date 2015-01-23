@@ -1,21 +1,21 @@
 # table.py: see http://en.wikipedia.org/wiki/LR_parser
 # converts a context-free grammar definition into an action/goto table, suitable for passing to an LR parser.
 from primitives import *
-from parseRules import parseRules
+from parseRules import parse_rules
 from prettyprint import dict_print
 
 
-def multiDict(seq, keyFunc):
+def multi_dict(seq, key_func):
     ret = {}
     for i in seq:
-        key = keyFunc(i)
+        key = key_func(i)
         if key not in ret:
             ret[key] = []
         ret[key].append(i)
     return ret
 
 
-def closureRepr(items):
+def closure_repr(items):
     return "\n".join(map(str, list(items)))
 
 
@@ -23,22 +23,22 @@ def closureRepr(items):
 class ParseTable:
     def __init__(self, rules):
         # the rules passed in is a list, but we want a dict keyed by each rule's LHS.
-        self.rules = multiDict(rules, lambda r: r.LHS)
+        self.rules = multi_dict(rules, lambda r: r.LHS)
         # we only need this for step four of constructing the action table.
-        self.orderedRules = rules
+        self.ordered_rules = rules
         # each closure's id, keyed by the closure itself
         # technical kink: the closure must be converted from set to list.
-        self.closureIds = {}
+        self.closure_ids = {}
         # the transition table, keyed by the current state and symbol.
         self.transitions = {}
 
-        itemsToRegister = set([Item(self.orderedRules[0])])
-        self.registerClosure(itemsToRegister)
+        items_to_register = set([Item(self.ordered_rules[0])])
+        self.register_closure(items_to_register)
 
     # creates a closure of the given set of items.
     def close(self, items):
         ret = items.copy()
-        for symbol in self.transitionSymbols(items):
+        for symbol in self.transition_symbols(items):
             if symbol not in self.rules:
                 continue
             for rule in self.rules[symbol]:
@@ -49,110 +49,110 @@ class ParseTable:
         return self.close(ret)
 
     # returns a set of symbols occuring just after a dot in the given item set.
-    # This is used during the registerClosure method to recursively identify sub-itemSets to register.
-    def transitionSymbols(self, items):
-        return set(filter(lambda y: y is not None, map(lambda x: x.markedSymbol(), items)))
+    # This is used during the register_closure method to recursively identify sub-item_sets to register.
+    def transition_symbols(self, items):
+        return set(filter(lambda y: y is not None, map(lambda x: x.marked_symbol(), items)))
 
     # returns a subset of items for which the given symbol is marked.
-    def itemsOfInterest(self, items, symbol):
-        return set(filter(lambda x: x.markedSymbol() is not None and x.markedSymbol() == symbol, items))
+    def items_of_interest(self, items, symbol):
+        return set(filter(lambda x: x.marked_symbol() is not None and x.marked_symbol() == symbol, items))
 
     # moves the dots in each item forward by one.
-    def advanceDots(self, items):
+    def advance_dots(self, items):
         ret = set()
         for i in items:
-            toAdd = i.copy()
-            toAdd.advanceMarker()
-            ret.add(toAdd)
+            to_add = i.copy()
+            to_add.advance_marker()
+            ret.add(to_add)
         return ret
 
-    def addTransition(self, sourceId, symbol, targetId):
-        key = (sourceId, symbol)
-        self.transitions[key] = targetId
+    def add_transition(self, source_id, symbol, target_id):
+        key = (source_id, symbol)
+        self.transitions[key] = target_id
 
     # closes the items given, then registers the closure if it is not already registered. returns the UID of the closure either way.
     # also recursively registers any sub-closures, and adds the appropriate entry to the transition dict.
-    def registerClosure(self, items):
+    def register_closure(self, items):
         closure = self.close(items)
-        idKey = tuple(closure)
-        if idKey in self.closureIds:
-            return self.closureIds[idKey]
-        closureId = len(self.closureIds)
-        self.closureIds[idKey] = closureId
+        id_key = tuple(closure)
+        if id_key in self.closure_ids:
+            return self.closure_ids[id_key]
+        closure_id = len(self.closure_ids)
+        self.closure_ids[id_key] = closure_id
 
-        for symbol in self.transitionSymbols(closure):
-            nextItems = self.advanceDots(self.itemsOfInterest(closure, symbol))
-            nextId = self.registerClosure(nextItems)
-            self.addTransition(closureId, symbol, nextId)
-        return closureId
+        for symbol in self.transition_symbols(closure):
+            next_items = self.advance_dots(self.items_of_interest(closure, symbol))
+            next_id = self.register_closure(next_items)
+            self.add_transition(closure_id, symbol, next_id)
+        return closure_id
 
     # returns true if one of the items is S ->(RHS), with the mark at the very end.
-    def containsStartAcceptingRule(self, items):
+    def contains_start_accepting_rule(self, items):
         return any(map(lambda x: x.rule.LHS == NonTerminal("_") and x.terminating(), items))
 
     # we say an item terminates a rule if the item's symbols match the rule's and the mark is at the rightmost position.
     # returns a collection of rule idxs, matching the rules that are terminated by any of the given items.
-    def rulesTerminated(self, items):
+    def rules_terminated(self, items):
         ret = []
         for item in items:
             if not item.terminating():
                 continue
-            for idx, rule in enumerate(self.orderedRules):
-                if idx != 0 and item.matchesRule(rule):
+            for idx, rule in enumerate(self.ordered_rules):
+                if idx != 0 and item.matches_rule(rule):
                     ret.append(idx)
         return ret
 
-    # should probably seperate this stuff into some kind of rulesCollection class.
+    # should probably seperate this stuff into some kind of rules_collection class.
     # returns a collection of strings representing each symbol in the rule set.
-    # you can supply a type, e.g. Terminal.symbolType, to get only those kinds of symbols.
+    # you can supply a type, e.g. Terminal.symbol_type, to get only those kinds of symbols.
     def symbols(self, type=None):
         ret = set()
-        for rule in self.orderedRules:
+        for rule in self.ordered_rules:
             for symbol in rule.RHS:
                 ret.add(symbol)
             ret.add(rule.LHS)
         ret.add(Terminal("$"))
         if type is not None:
-            ret = filter(lambda x: x.symbolType == type, ret)
+            ret = filter(lambda x: x.symbol_type == type, ret)
         return ret
 
     # goto table and action table constructed using the rules from:
     # http://en.wikipedia.org/wiki/LR_parser
     # "Constructing the action and goto tables"
-    def gotoTable(self):
+    def goto_table(self):
         ret = {}
         # 1. The columns for nonterminals are copied to the goto table.
         for state, symbol in self.transitions:
-            if symbol.symbolType == NonTerminal.symbolType:
+            if symbol.symbol_type == NonTerminal.symbol_type:
                 key = (state, symbol)
                 ret[key] = self.transitions[key]
         return ret
 
-    def actionTable(self):
+    def action_table(self):
         ret = {}
 
         # 2. The columns for the terminals are copied to the action table as shift actions.
         for state, symbol in self.transitions:
-            if symbol.symbolType == Terminal.symbolType:
+            if symbol.symbol_type == Terminal.symbol_type:
                 destination = self.transitions[(state, symbol)]
                 ret[(state, symbol.value)] = Action(shift, destination)
 
         # 3. An extra column for '$' (end of input) is added to the action table that contains acc for every item set that contains "S -> E.".
-        for closure in self.closureIds:
-            if self.containsStartAcceptingRule(closure):
-                idx = self.closureIds[closure]
+        for closure in self.closure_ids:
+            if self.contains_start_accepting_rule(closure):
+                idx = self.closure_ids[closure]
                 ret[(idx, "$")] = Action(accept)
 
         # 4. If an item set i contains an item of the form "A -> w." and "A -> w" is rule m with m>0,
         # then the row for state i in the action table is completely filled with the reduce action rm.
-        for closure, i in self.closureIds.iteritems():
-            idxsTerminated = self.rulesTerminated(closure)
-            if len(idxsTerminated) == 0:
+        for closure, i in self.closure_ids.iteritems():
+            idxs_terminated = self.rules_terminated(closure)
+            if len(idxs_terminated) == 0:
                 continue
-            if len(idxsTerminated) > 1:
+            if len(idxs_terminated) > 1:
                 raise Exception("Reduce-Reduce conflict on row {0}".format(i))
-            m = idxsTerminated[0]
-            for symbol in self.symbols(Terminal.symbolType):
+            m = idxs_terminated[0]
+            for symbol in self.symbols(Terminal.symbol_type):
                 key = (i, symbol.value)
                 if key in ret:
                     raise Exception("Shift-reduce conflict at {0}".format(key))
@@ -161,4 +161,4 @@ class ParseTable:
         return ret
 
     def __repr__(self):
-        return dict_print(self.actionTable()) + "\n" + dict_print(self.gotoTable())
+        return dict_print(self.action_table()) + "\n" + dict_print(self.goto_table())
