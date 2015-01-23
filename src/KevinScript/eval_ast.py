@@ -1,6 +1,7 @@
 import ast
 from ktypes import Function, KObject, KInt, KBool, KString, KList, KNone
 
+
 def extract_identifiers(node):
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "identifier":
@@ -12,6 +13,7 @@ def extract_identifiers(node):
         for child in node.children:
             ret = ret + extract_identifiers(child)
         return ret
+
 
 def evaluate(node, scopes):
     def getVar(name):
@@ -38,17 +40,18 @@ def evaluate(node, scopes):
         else:
             raise Exception("evaluate not implemented yet for leaf {}".format(node.token))
     else:
-        #classes that just pass its single child forward
+        # classes that just pass its single child forward
         if node.klass in "Expression Value Enclosure Literal Atom Primary".split():
             return evaluate(node.children[0], scopes)
 
-        #statements.
-        #when evaluated, all statements should return one of two values:
-        #{"returning": True, "value": returnValue} - when a `Return` statement was executed, and we need to move back up to the most recent function call
-        #`statement_default_return_value` - when no return statement has been executed.
+        # statements.
+        # when evaluated, all statements should return one of two values:
+        # {"returning": True, "value": returnValue} - when a `Return` statement was executed, and we need to move back up to the most recent function call
+        # `statement_default_return_value` - when no return statement has been executed.
         if node.klass == "Statement":
             result = evaluate(node.children[0], scopes)
-            if result["returning"]: return result
+            if result["returning"]:
+                return result
             return statement_default_return_value
         if node.klass == "StatementList":
             for child in node.children:
@@ -58,10 +61,10 @@ def evaluate(node, scopes):
             return statement_default_return_value
         elif node.klass == "AssignmentStatement":
             lhs, expression_node = node.children
-            #identifier assignment
+            # identifier assignment
             if isinstance(lhs, ast.Leaf):
                 scopes[-1][lhs.token.value] = evaluate(expression_node, scopes)
-            #attribute assignment
+            # attribute assignment
             else:
                 node = evaluate(lhs.children[0], scopes)
                 attribute_name = lhs.children[1].token.value
@@ -83,11 +86,13 @@ def evaluate(node, scopes):
                 cond = evaluate(node.children[0], scopes)
                 if not isinstance(cond, KBool):
                     cond = cond.bool()
-                if not cond.value: break
+                if not cond.value:
+                    break
                 result = evaluate(node.children[1], scopes)
-                if result["returning"]: return result
+                if result["returning"]:
+                    return result
             return statement_default_return_value
-        #expression must evaluate to an object that has a `size` and `at` method
+        # expression must evaluate to an object that has a `size` and `at` method
         elif node.klass == "ForStatement":
             identifier = node.children[0].token.value
             seq = evaluate(node.children[1], scopes)
@@ -96,7 +101,8 @@ def evaluate(node, scopes):
                 item = seq.get_attribute("at").eval(scopes, [KInt(idx)])
                 scopes[-1][identifier] = item
                 result = evaluate(node.children[2], scopes)
-                if result["returning"]: return result
+                if result["returning"]:
+                    return result
             return statement_default_return_value
         elif node.klass == "IfStatement":
             cond = evaluate(node.children[0], scopes)
@@ -105,14 +111,16 @@ def evaluate(node, scopes):
             assert isinstance(cond, KBool), "expected KBool, got {}".format(type(cond))
             if cond.value:
                 result = evaluate(node.children[1], scopes)
-                if result["returning"]: return result
+                if result["returning"]:
+                    return result
             elif len(node.children) > 2:
                 result = evaluate(node.children[2], scopes)
-                if result["returning"]: return result
+                if result["returning"]:
+                    return result
             return statement_default_return_value
         if node.klass == "FunctionDeclarationStatement":
-            #function statements, ex. `function frob(x){return x;}`, 
-            #are just syntactic sugar for ex. `frob = function(x){return x;};`
+            # function statements, ex. `function frob(x){return x;}`,
+            # are just syntactic sugar for ex. `frob = function(x){return x;};`
             func = ast.Node("FunctionDeclaration", node.children[1:])
             id = node.children[0]
             assignment = ast.Node("AssignmentStatement", [id, func])
@@ -124,7 +132,7 @@ def evaluate(node, scopes):
             return statement_default_return_value
 
         elif node.klass == "FunctionDeclaration":
-            if len(node.children) > 1: #no arguments
+            if len(node.children) > 1:  # no arguments
                 arguments = evaluate(node.children[0], scopes)
                 body = node.children[1]
             else:
@@ -137,9 +145,9 @@ def evaluate(node, scopes):
                 return [first]
             else:
                 return [first] + evaluate(node.children[1], scopes)
-        
-        #note: this only gets evaluated for AttributeRefs not belonging to an AssignmentStatement. 
-        #Those nodes are handled specially in the AssignmentStatement block.
+
+        # note: this only gets evaluated for AttributeRefs not belonging to an AssignmentStatement.
+        # Those nodes are handled specially in the AssignmentStatement block.
         elif node.klass == "AttributeRef":
             obj = evaluate(node.children[0], scopes)
             attribute_name = node.children[1].token.value
@@ -165,7 +173,7 @@ def evaluate(node, scopes):
                 operator = node.children[1].token.value
                 right = evaluate(node.children[2], scopes)
                 func_name = {
-                    "+": "__add__", 
+                    "+": "__add__",
                     "-": "__sub__",
                     "*": "__mul__",
                     "/": "__div__",
@@ -177,7 +185,7 @@ def evaluate(node, scopes):
                 }[operator]
                 method = left.get_attribute(func_name)
                 assert method, "object {} has no method {}".format(left, func_name)
-                
+
                 return method.eval(scopes, [right])
         elif node.klass == "ListDisplay":
             items = []
