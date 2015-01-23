@@ -2,7 +2,8 @@ from parseRules import parseRules
 from SLRtable import ParseTable
 from LRParser import LRParser
 
-def constructParser(rulesText, isVerbose = False):
+
+def constructParser(rulesText, isVerbose=False):
     def log(msg=""):
         if isVerbose:
             print msg
@@ -11,7 +12,7 @@ def constructParser(rulesText, isVerbose = False):
     rules = parseRules(rulesText)
     log("\n".join(map(str, rules)))
     log()
-    
+
     log("Constructing parse tables...")
     table = ParseTable(rules)
     log(table)
@@ -19,7 +20,8 @@ def constructParser(rulesText, isVerbose = False):
     parser = LRParser(rules, table.actionTable(), table.gotoTable())
     return parser
 
-#returns True if the program is valid, False otherwise
+
+# returns True if the program is valid, False otherwise
 def isValid(rulesText, programText):
     rules = parseRules(rulesText)
     table = ParseTable(rules)
