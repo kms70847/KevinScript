@@ -1,5 +1,5 @@
-#converts a string into an array of rules.
-#example input:
+# converts a string into an array of rules.
+# example input:
 """\
 S -> Expression
 Expression -> Expression * Binary
@@ -11,14 +11,15 @@ Binary -> 1"""
 
 from primitives import *
 
+
 def parseRules(ruleText):
     ret = []
     lines = ruleText.split("\n")
-    #remove comments and trailing whitespace
+    # remove comments and trailing whitespace
     lines = [line.partition("#")[0].strip() for line in lines]
-    #filter out empty lines
+    # filter out empty lines
     lines = [line for line in lines if len(line) > 1]
-    #expand lines of the form "A -> B | C" into two lines, "A -> B" and "A -> C"
+    # expand lines of the form "A -> B | C" into two lines, "A -> B" and "A -> C"
     expandedLines = []
     for line in lines:
         if "|" in line:
@@ -38,7 +39,8 @@ def parseRules(ruleText):
         LHS = NonTerminal(line[0].strip())
         RHS = []
         for token in line[1].split():
-            if token == "%SPACE%": token = " "
+            if token == "%SPACE%":
+                token = " "
             if token in nonTerminalSymbols:
                 RHS.append(NonTerminal(token))
             else:
