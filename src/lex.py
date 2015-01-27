@@ -86,7 +86,7 @@ def lex(text, token_rules):
     tokens = []
     while len(text) > 0:
         matches = [{"rule": rule, "size": rule.match(text)} for rule in token_rules]
-        matches = [match for match in matches if match["size"] > 0]
+        matches = [match for match in matches if match["size"] and match["size"] > 0]
         assert len(matches) > 0, "Couldn't parse text at line {}, position {}: {}".format(line_number, idx, repr(text[:20]))
         match = max(matches, key=lambda m: m["size"])
         size = match["size"]
