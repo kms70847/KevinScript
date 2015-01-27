@@ -34,7 +34,7 @@ def _enclosed_join(separator, seq):
 
 # prints a sequence of items, each one _padded according to its given width.
 def _row_print(row, widths):
-    return _enclosed_join("|", map(lambda x: _pad(x[0], x[1]), zip(row, widths)))
+    return _enclosed_join("|", [_pad(x[0], x[1]) for x in zip(row, widths)])
 
 
 # finds the widest element in one column of a grid
@@ -45,13 +45,13 @@ def _max_width(grid, column):
 # returns a printable grid representation
 def grid_print(grid):
     widths = [_max_width(grid, x) for x in range(len(grid[0]))]
-    row_separator = "\n" + _enclosed_join("+", map(lambda x: "-" * x, widths)) + "\n"
+    row_separator = "\n" + _enclosed_join("+", ["-" * x for x in widths]) + "\n"
     return _enclosed_join(row_separator, [_row_print(row, widths) for row in grid])
 
 
 # like map, but for 2d arrays.
 def _grid_map(func, grid):
-    return map(lambda x: map(func, x), grid)
+    return [list(map(func, x)) for x in grid]
 
 
 # given a dict `d`, whose keys are 2 element tuples,
@@ -59,8 +59,8 @@ def _grid_map(func, grid):
 # ex. In the sample grid at the top of this page,
 # 0-6, $, (, ) are keys, and s1, r2, etc are values.
 def _grid_from_dict(d):
-    first_keys = list(set(map(lambda x: x[0], d)))
-    second_keys = list(set(map(lambda x: x[1], d)))
+    first_keys = list(set([x[0] for x in d]))
+    second_keys = list(set([x[1] for x in d]))
     first_keys.sort()
     second_keys.sort()
     ret = [["X"]]

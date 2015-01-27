@@ -51,11 +51,11 @@ class ParseTable:
     # returns a set of symbols occuring just after a dot in the given item set.
     # This is used during the register_closure method to recursively identify sub-item_sets to register.
     def transition_symbols(self, items):
-        return set(filter(lambda y: y is not None, map(lambda x: x.marked_symbol(), items)))
+        return set([y for y in [x.marked_symbol() for x in items] if y is not None])
 
     # returns a subset of items for which the given symbol is marked.
     def items_of_interest(self, items, symbol):
-        return set(filter(lambda x: x.marked_symbol() is not None and x.marked_symbol() == symbol, items))
+        return set([x for x in items if x.marked_symbol() is not None and x.marked_symbol() == symbol])
 
     # moves the dots in each item forward by one.
     def advance_dots(self, items):
@@ -88,7 +88,7 @@ class ParseTable:
 
     # returns true if one of the items is S ->(RHS), with the mark at the very end.
     def contains_start_accepting_rule(self, items):
-        return any(map(lambda x: x.rule.LHS == NonTerminal("_") and x.terminating(), items))
+        return any([x.rule.LHS == NonTerminal("_") and x.terminating() for x in items])
 
     # we say an item terminates a rule if the item's symbols match the rule's and the mark is at the rightmost position.
     # returns a collection of rule idxs, matching the rules that are terminated by any of the given items.
@@ -113,7 +113,7 @@ class ParseTable:
             ret.add(rule.LHS)
         ret.add(Terminal("$"))
         if type is not None:
-            ret = filter(lambda x: x.symbol_type == type, ret)
+            ret = [x for x in ret if x.symbol_type == type]
         return ret
 
     # goto table and action table constructed using the rules from:
@@ -145,7 +145,7 @@ class ParseTable:
 
         # 4. If an item set i contains an item of the form "A -> w." and "A -> w" is rule m with m>0,
         # then the row for state i in the action table is completely filled with the reduce action rm.
-        for closure, i in self.closure_ids.iteritems():
+        for closure, i in self.closure_ids.items():
             idxs_terminated = self.rules_terminated(closure)
             if len(idxs_terminated) == 0:
                 continue

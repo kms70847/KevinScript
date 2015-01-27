@@ -6,7 +6,7 @@ from LRParser import LRParser
 def construct_parser(rules_text, is_verbose=False):
     def log(msg=""):
         if is_verbose:
-            print msg
+            print(msg)
 
     log("Parsing rules...")
     rules = parse_rules(rules_text)

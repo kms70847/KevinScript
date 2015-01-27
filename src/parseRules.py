@@ -31,9 +31,9 @@ def parse_rules(rule_text):
             expanded_lines.append(line)
     lines = expanded_lines
 
-    non_terminal_symbols = set(map(lambda x: x.split("->")[0].strip(), lines))
+    non_terminal_symbols = set([x.split("->")[0].strip() for x in lines])
     if "_" not in non_terminal_symbols:
-        print "Warning, expected starting Symbol _"
+        print("Warning, expected starting Symbol _")
     for line in lines:
         line = line.split("->")
         LHS = NonTerminal(line[0].strip())

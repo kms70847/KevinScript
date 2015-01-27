@@ -10,7 +10,7 @@ from ktypes import KTrue, KFalse, KObject, KInt, PyFunction
 
 import sys
 if len(sys.argv) < 2:
-    print "please supply a file name."
+    print("please supply a file name.")
     sys.exit(0)
 reducible_nodes = ["StatementList", "ExpressionList", "KeyValueList"]
 tree = ast.construct_ast("tokens.txt", "language.txt", sys.argv[1], reducible_nodes)

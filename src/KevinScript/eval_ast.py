@@ -76,7 +76,7 @@ def evaluate(node, scopes):
             assert method, "object {} has no method __repr__".format(obj)
             result = method.eval(scopes, [])
             assert isinstance(result, KString), "expected repr to return KString, got {}".format(type(result))
-            print result.value
+            print((result.value))
             return statement_default_return_value
         elif node.klass == "ReturnStatement":
             value = evaluate(node.children[0], scopes)
