@@ -2,7 +2,11 @@
 
 
 "print statements";
-print "testing print statements... passed";
+print "testing print statements...";
+print 1;
+print None;
+print None.type;
+print "passed.";
 
 "assignment statements";
 foo = 23;
