@@ -91,7 +91,7 @@ def evaluate(node, scopes):
         elif node.klass == "PrintStatement":
             obj = evaluate(node.children[0], scopes)
             method = obj["public"].get("__repr__")
-            assert method, "object {} has no method __repr__".format(obj)
+            assert method, "{} object has no method __repr__".format(get_type_name(obj))
             result = evaluate_function(method, scopes, [])
             assert get_type_name(result) == "String", "expected repr to return String, got {}".format(get_type_name(result))
             print(result["private"]["value"])
