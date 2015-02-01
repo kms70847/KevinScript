@@ -1,6 +1,5 @@
 import ast
-from ktypes import Function, KObject, KInt, KBool, KString, KList, KNone
-
+from kobjects import builtins, make_String, make_Integer, make_List, make_Function
 
 def extract_identifiers(node):
     if isinstance(node, ast.Leaf):
@@ -14,6 +13,25 @@ def extract_identifiers(node):
             ret = ret + extract_identifiers(child)
         return ret
 
+def evaluate_function(func, scopes, argument_values):
+    if isinstance(func["private"]["body"], ast.Node):
+        #pure KS func
+        locals = {}
+        for i in range(len(argument_values)):
+            name = func["private"]["arguments"][i]
+            value = argument_values[i]
+            locals[name] = value
+        result = evaluate(
+            func["private"]["body"], 
+            func["private"]["closure"] + [locals]
+        )
+        return result["value"]
+    else:
+        #external code func
+        return func["private"]["body"](scopes, *argument_values)
+
+def get_type_name(obj):
+    return obj["public"]["type"]["private"]["name"]
 
 def evaluate(node, scopes):
     def get_var(name):
@@ -28,15 +46,15 @@ def evaluate(node, scopes):
         else:
             return line(node.children[0])
 
-    statement_default_return_value = {"returning": False, "value": KNone}
+    statement_default_return_value = {"returning": False, "value": builtins["None"]}
 
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "number":
-            return KInt(int(node.token.value))
+            return make_Integer(int(node.token.value))
         elif node.token.klass.name == "identifier":
             return get_var(node.token.value)
         elif node.token.klass.name == "string_literal":
-            return KString(node.token.value[1:-1])
+            return make_String(node.token.value[1:-1])
         else:
             raise Exception("evaluate not implemented yet for leaf {}".format(node.token))
     else:
@@ -68,15 +86,15 @@ def evaluate(node, scopes):
             else:
                 node = evaluate(lhs.children[0], scopes)
                 attribute_name = lhs.children[1].token.value
-                node.set_attribute(attribute_name, evaluate(expression_node, scopes))
+                node["public"][attribute_name] = evaluate(expression_node, scopes)
             return statement_default_return_value
         elif node.klass == "PrintStatement":
             obj = evaluate(node.children[0], scopes)
-            method = obj.get_attribute("__repr__")
+            method = obj["public"].get("__repr__")
             assert method, "object {} has no method __repr__".format(obj)
-            result = method.eval(scopes, [])
-            assert isinstance(result, KString), "expected repr to return KString, got {}".format(type(result))
-            print((result.value))
+            result = evaluate_function(method, scopes, [obj])
+            assert get_type_name(result) == "String", "expected repr to return String, got {}".format(get_type_name(result))
+            print(result["private"]["value"])
             return statement_default_return_value
         elif node.klass == "ReturnStatement":
             value = evaluate(node.children[0], scopes)
@@ -84,9 +102,9 @@ def evaluate(node, scopes):
         elif node.klass == "WhileStatement":
             while True:
                 cond = evaluate(node.children[0], scopes)
-                if not isinstance(cond, KBool):
+                if not get_type_name(cond) == "Boolean":
                     cond = cond.bool()
-                if not cond.value:
+                if not cond["private"]["value"]:
                     break
                 result = evaluate(node.children[1], scopes)
                 if result["returning"]:
@@ -96,9 +114,9 @@ def evaluate(node, scopes):
         elif node.klass == "ForStatement":
             identifier = node.children[0].token.value
             seq = evaluate(node.children[1], scopes)
-            size = seq.get_attribute("size").eval(scopes, []).value
+            size = evaluate_function(seq["public"].get("size"), scopes, [])["private"]["value"]
             for idx in range(size):
-                item = seq.get_attribute("at").eval(scopes, [KInt(idx)])
+                item = evaluate_function(seq["public"].get("at"), scopes, [make_Integer(idx)])
                 scopes[-1][identifier] = item
                 result = evaluate(node.children[2], scopes)
                 if result["returning"]:
@@ -106,10 +124,10 @@ def evaluate(node, scopes):
             return statement_default_return_value
         elif node.klass == "IfStatement":
             cond = evaluate(node.children[0], scopes)
-            if not isinstance(cond, KBool):
+            if not get_type_name(cond) == "Boolean":
                 cond = cond.bool()
-            assert isinstance(cond, KBool), "expected KBool, got {}".format(type(cond))
-            if cond.value:
+            assert get_type_name(cond) == "Boolean", "expected Boolean, got {}".format(get_type_name(cond))
+            if cond["private"]["value"]:
                 result = evaluate(node.children[1], scopes)
                 if result["returning"]:
                     return result
@@ -138,7 +156,7 @@ def evaluate(node, scopes):
             else:
                 arguments = []
                 body = node.children[0]
-            return Function(scopes, arguments, body)
+            return make_Function(body, arguments, scopes)
         elif node.klass == "FunctionDeclarationArgumentList":
             first = node.children[0].token.value
             if len(node.children) == 1:
@@ -151,18 +169,22 @@ def evaluate(node, scopes):
         elif node.klass == "AttributeRef":
             obj = evaluate(node.children[0], scopes)
             attribute_name = node.children[1].token.value
-            return obj.get_attribute(attribute_name)
+            return obj["public"][attribute_name]
         elif node.klass == "Call":
             callable = evaluate(node.children[0], scopes)
             if len(node.children) == 1:
                 arguments = []
             else:
                 arguments = evaluate(node.children[1], scopes)
-            if isinstance(callable, KObject):
-                callable = callable.get_attribute("__call__")
-
-            assert isinstance(callable, Function), "expected function, got {} at {}".format(callable, line(node))
-            return callable.eval(scopes, arguments)
+            is_func = lambda obj: all(attr in obj["private"] for attr in ("body", "arguments", "closure"))
+            while "__call__" in callable["public"] and not is_func(callable):
+                callable = callable["public"]["__call__"]
+            assert is_func(callable), "expected callable, got {} at {}".format(get_type_name(callable), line(node))
+            try:
+                return evaluate_function(callable, scopes, arguments)
+            except:
+                print "Couldn't call function on line {}".format(line(node))
+                raise
         elif node.klass == "ExpressionList":
             return [evaluate(child, scopes) for child in node.children]
         elif node.klass in "AddExpression CompExpression MultExpression".split():
@@ -183,14 +205,14 @@ def evaluate(node, scopes):
                     "==": "__eq__",
                     "!=": "__neq__"
                 }[operator]
-                method = left.get_attribute(func_name)
-                assert method, "object {} has no method {}".format(left, func_name)
+                method = left["public"].get(func_name)
+                assert method, "object {} has no method {}".format(get_type_name(left), func_name)
 
-                return method.eval(scopes, [right])
+                return evaluate_function(method, scopes, [right])
         elif node.klass == "ListDisplay":
             items = []
             if node.children:
                 items = evaluate(node.children[0], scopes)
-            return KList(items)
+            return make_List(items)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))

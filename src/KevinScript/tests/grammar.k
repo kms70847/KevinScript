@@ -86,10 +86,10 @@ narf = function(x,y){return x - y;};
 "built-in nonliterals";
 True;
 False;
-object();
+Object();
 
 "attribute access";
-foo = object();
+foo = Object();
 foo.bar = 23;
 foo.troz = function(){return 23;};
 foo.troz();
