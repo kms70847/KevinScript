@@ -37,8 +37,8 @@ def make_Object(type_name="Object"):
     repr = {
         "private": {
             "closure":[], 
-            "arguments":["self"], 
-            "body": lambda closure, self: make_String("<{} instance>".format(type_name))
+            "arguments":[], 
+            "body": lambda closure: make_String("<{} instance>".format(type_name))
         },
         "public": {
             "type": builtins["Function"]
@@ -60,7 +60,7 @@ def make_Type(name, instance_methods):
 def make_String(s=""):
     ret = make_Object("String")
     ret["private"]["value"] = s
-    ret["public"]["__repr__"] = make_Function(lambda scopes, self: ret)
+    ret["public"]["__repr__"] = make_Function(lambda scopes: ret)
     return ret
 
 def make_Integer(value=0):
@@ -111,6 +111,9 @@ def make_List(items):
     ret["public"]["append"] = make_Function(lambda scope, value: [builtins["None"], items.append(value)][0])
     ret["public"]["pop"] = make_Function(lambda scope: [builtins["None"], items.pop()][0])
     return ret
+
+for name in type_names:
+    builtins[name]["public"]["__repr__"] = (lambda n=name: make_Function(lambda scopes: make_String("<type '{}'>".format(n))))()
 
 builtins["False"] = make_Boolean(False)
 builtins["True"] = make_Boolean(True)

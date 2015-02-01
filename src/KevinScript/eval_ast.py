@@ -92,7 +92,7 @@ def evaluate(node, scopes):
             obj = evaluate(node.children[0], scopes)
             method = obj["public"].get("__repr__")
             assert method, "object {} has no method __repr__".format(obj)
-            result = evaluate_function(method, scopes, [obj])
+            result = evaluate_function(method, scopes, [])
             assert get_type_name(result) == "String", "expected repr to return String, got {}".format(get_type_name(result))
             print(result["private"]["value"])
             return statement_default_return_value
