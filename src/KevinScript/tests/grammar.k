@@ -4,6 +4,8 @@
 "print statements";
 print "testing print statements...";
 print 1;
+print True;
+print False;
 print None;
 print None.type;
 print "passed.";

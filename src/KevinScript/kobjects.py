@@ -102,6 +102,7 @@ def make_Function(body, arguments=None, closure=None):
 def make_Boolean(value=False):
     ret = make_Object("Boolean")
     ret["private"]["value"] = value
+    ret["public"]["__repr__"] = make_Function(lambda scopes: make_String("True" if ret["private"]["value"] else "False"))
     return ret
 
 def make_List(items):
