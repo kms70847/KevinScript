@@ -77,6 +77,7 @@ def make_Integer(value=0):
     ret["public"]["__mul__"] = make_Function(lambda scopes, other: make_Integer(ret["private"]["value"] * other["private"]["value"]))
     ret["public"]["__div__"] = make_Function(lambda scopes, other: make_Integer(ret["private"]["value"] / other["private"]["value"]))
     ret["public"]["__mod__"] = make_Function(lambda scopes, other: make_Integer(ret["private"]["value"] % other["private"]["value"]))
+    ret["public"]["__repr__"] = make_Function(lambda scopes: make_String(str(ret["private"]["value"])))
     return ret
 
 """
