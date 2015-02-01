@@ -94,4 +94,7 @@ foo.bar = 23;
 foo.troz = function(){return 23;};
 foo.troz();
 
+"type associations";
+print "foo".type;
+
 print "all tests passed!";
