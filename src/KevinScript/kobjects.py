@@ -115,6 +115,7 @@ def make_List(items):
 
 for name in type_names:
     builtins[name]["public"]["__repr__"] = (lambda n=name: make_Function(lambda scopes: make_String("<type '{}'>".format(n))))()
+builtins["None"]["public"]["__repr__"] = make_Function(lambda scopes: make_String("None"))
 
 builtins["False"] = make_Boolean(False)
 builtins["True"] = make_Boolean(True)
