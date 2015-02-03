@@ -1,8 +1,9 @@
 # ugly stuff to import modules one directory up
 import os
 import sys
-parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, parentdir)
+top_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+parser_dir = os.path.join(top_dir, "lib", "parser")
+sys.path.insert(0, parser_dir)
 
 import ast
 from eval_ast import evaluate
