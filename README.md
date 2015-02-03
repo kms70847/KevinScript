@@ -3,17 +3,23 @@ KevinScript
 
 A toy language, borrowing heavily from Python and javascript.
 
-Sample usage (all commands from src/KevinScript directory):
+Sample usage (all commands from base KevinScript directory):
 
-    >main.py tests/grammar.k
-    testing print statements... passed
+    >src\main.py samples\grammar.k
+    testing print statements...
+    1
+    True
+    False
+    None
+    <type 'Nonetype'>
+    passed.
     dict displays are not implemented yet
     all tests passed!
-
-    >main.py tests/hello_world.k
+    
+    >src\main.py samples\hello_world.k
     Hello, World!
-
-    >main.py tests/prime_detector.k
+    
+    >src\main.py samples\prime_detector.k
     Prime numbers below 100:
     2
     3
