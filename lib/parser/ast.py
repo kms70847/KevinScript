@@ -51,72 +51,6 @@ def is_leaf(node):
     return isinstance(node, Leaf)
 
 
-"""
-# previous version of construct_parse_tree.
-# couldn't handle tall trees, due to python's recursion limit.
-def construct_parse_tree(right_derivation, rules, tokens):
-    #make local copies so as not to mutate the originals
-    rule = rules[right_derivation.pop()]
-    children = []
-    for symbol in rule.RHS[::-1]:
-        if symbol.symbol_type == "Terminal":
-            children.append(Leaf(tokens.pop()))
-        elif symbol.symbol_type == "NonTerminal":
-            children.append(construct_parse_tree(right_derivation, rules, tokens))
-        else:
-            raise Exception("unexpected symbol type {}".format(symbol.symbol_type))
-    children = children[::-1]
-    ret = Node(rule.LHS.value)
-    ret.children = children
-    return ret
-"""
-
-
-def construct_parse_tree(right_derivation, rules, tokens):
-
-    # iterates through the nodes of the tree, depth first, yielding the node and then moving down the rightmost path.
-    def iter_tree(tree):
-        to_search = [tree]
-        while to_search:
-            node = to_search.pop()
-            yield node
-            if not is_leaf(node):
-                for child in node.children:
-                    to_search.append(child)
-
-    # locates the rightmost node in the tree that hasn't been fully created.
-    def first_unfinished_node(tree):
-        for node in iter_tree(tree):
-            if not is_leaf(node):
-                if len(node.children) == 0:
-                    return node
-        return None
-
-    # make local copies so as not to mutate the originals
-    right_derivation = right_derivation[:]
-    tokens = tokens[:]
-
-    tree = Node(rules[0].RHS[0].value)
-    # first pass: construct tree without assigning tokens to leaves
-    while right_derivation:
-        rule = rules[right_derivation.pop()]
-        node = first_unfinished_node(tree)
-        for symbol in rule.RHS[::-1]:
-            if symbol.symbol_type == "Terminal":
-                node.children.insert(0, Leaf(None))
-            elif symbol.symbol_type == "NonTerminal":
-                node.children.insert(0, Node(symbol.value))
-            else:
-                raise Exception("unexpected symbol type {}".format(symbol.symbol_type))
-
-    # second pass: assign token values to leaves
-    for node in iter_tree(tree):
-        if is_leaf(node):
-            node.token = tokens.pop()
-
-    return tree
-
-
 # iterates through the nodes of the tree, depth first, yielding the node and then moving down the rightmost path.
 def iter_tree(tree):
     to_search = [tree]
@@ -128,7 +62,7 @@ def iter_tree(tree):
                 to_search.append(child)
 
 
-def construct_parse_tree_v3(right_derivation, rules, tokens):
+def construct_parse_tree(right_derivation, rules, tokens):
 
     # make local copies so as not to mutate the originals
     right_derivation = right_derivation[:]
@@ -223,7 +157,7 @@ def construct_ast(tokens_filename, rules_filename, program_filename, reducible_n
     parser = construct_parser(rules_text)
     right_derivation = parser.parse(tokens)
 
-    parse_tree = construct_parse_tree_v3(right_derivation, rules, tokens)
+    parse_tree = construct_parse_tree(right_derivation, rules, tokens)
 
     remove_literal_tokens(parse_tree)
     for name in reducible_node_names:
