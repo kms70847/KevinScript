@@ -5,7 +5,7 @@ A toy language, borrowing heavily from Python and javascript.
 
 Sample usage (all commands from base KevinScript directory):
 
-    >src\main.py samples\grammar.k
+    >"src/ks.py" "samples/grammar.k"
     testing print statements...
     1
     True
@@ -16,10 +16,10 @@ Sample usage (all commands from base KevinScript directory):
     dict displays are not implemented yet
     all tests passed!
     
-    >src\main.py samples\hello_world.k
+    >"src/ks.py" "samples/hello_world.k"
     Hello, World!
     
-    >src\main.py samples\prime_detector.k
+    >"src/ks.py" "samples/prime_detector.k"
     Prime numbers below 100:
     2
     3
