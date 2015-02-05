@@ -14,12 +14,17 @@ if len(sys.argv) < 2:
     print("please supply a file name.")
     sys.exit(0)
 reducible_nodes = ["StatementList", "ExpressionList", "KeyValueList"]
-tree = ast.construct_ast(
+
+compile = ast.get_compiler(
     os.path.join(cur_dir, "tokens.txt"), 
     os.path.join(cur_dir, "language.txt"), 
-    sys.argv[1], 
     reducible_nodes
 )
+
+with open(sys.argv[1]) as file:
+    program_text = file.read()
+
+tree = compile(program_text)
 
 scopes = [builtins]
 evaluate(tree, scopes)

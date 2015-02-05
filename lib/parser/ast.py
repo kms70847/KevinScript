@@ -132,13 +132,14 @@ def reduce_tail_recursive_nodes(tree, klass):
                 last_child = node.children[-1]
 
 
-def construct_ast(tokens_filename, rules_filename, program_filename, reducible_node_names=None):
-    """Constructs an abstract syntax tree for the given program.
+def get_compiler(tokens_filename, rules_filename, reducible_node_names=None):
+    """Creates a callable which can be used to construct abstract syntax trees for the given program.
     arguments:
         tokens_filename - the filename of the file which contains the regexes that match literal token values.
         rules_filename  - the filename of the file which contains the language rules in Backus Naur Form.
-        program-filename- the filename of the program to the compiled.
         reducible_node_names - optional. a list of strings, indicating which tail-recursive nodes should be reduced. See `reduce_tail_recursive_nodes` for more information.
+    returns:
+        function construct_ast(program_text), which returns the root Node of the constructed ast.
     """
     if not reducible_node_names:
         reducible_node_names = []
@@ -148,18 +149,21 @@ def construct_ast(tokens_filename, rules_filename, program_filename, reducible_n
     lex_text = slurp(tokens_filename)
     token_rules = gen_token_rules(lex_text, rules)
 
-    program_text = slurp(program_filename)
-    tokens = lex(program_text, token_rules)
-
-    # todo: this kind of post-lexing processing should be specified by the caller somehow.
-    tokens = [token for token in tokens if token.klass.name != "whitespace"]
-
     parser = construct_parser(rules_text)
-    right_derivation = parser.parse(tokens)
 
-    parse_tree = construct_parse_tree(right_derivation, rules, tokens)
+    def construct_ast(program_text):
+        tokens = lex(program_text, token_rules)
 
-    remove_literal_tokens(parse_tree)
-    for name in reducible_node_names:
-        reduce_tail_recursive_nodes(parse_tree, name)
-    return parse_tree
+        # todo: this kind of post-lexing processing should be specified by the caller somehow.
+        tokens = [token for token in tokens if token.klass.name != "whitespace"]
+
+        right_derivation = parser.parse(tokens)
+
+        parse_tree = construct_parse_tree(right_derivation, rules, tokens)
+
+        remove_literal_tokens(parse_tree)
+        for name in reducible_node_names:
+            reduce_tail_recursive_nodes(parse_tree, name)
+        return parse_tree
+
+    return construct_ast
