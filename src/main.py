@@ -9,10 +9,6 @@ import ast
 from eval_ast import evaluate
 from kobjects import builtins
 
-import sys
-if len(sys.argv) < 2:
-    print("please supply a file name.")
-    sys.exit(0)
 reducible_nodes = ["StatementList", "ExpressionList", "KeyValueList"]
 
 compile = ast.get_compiler(
@@ -21,14 +17,21 @@ compile = ast.get_compiler(
     reducible_nodes
 )
 
-with open(sys.argv[1]) as file:
-    program_text = file.read()
+def execute(program_text, strict=False):
+    if not strict:
+        program_text += ";"
+    tree = compile(program_text)
+    scopes = [builtins]
+    evaluate(tree, scopes)
 
-if "--strict" not in sys.argv[2:]:
-    if not program_text.endswith(";"):
-        program_text = program_text + ";"
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("please supply a file name.")
+        sys.exit(0)
 
-tree = compile(program_text)
 
-scopes = [builtins]
-evaluate(tree, scopes)
+    with open(sys.argv[1]) as file:
+        program_text = file.read()
+
+    execute(program_text, "--strict" in sys.argv[2:])
