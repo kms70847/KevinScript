@@ -53,4 +53,4 @@ expect_runs("""
 #if statements
 expect_runs('if (True){;}')
 expect_output('if (True){print "success";}', "success")
-expect_output('if (False){;} else{print "success"}', "success")
+expect_output('if (False){;} else{print "success";}', "success")
