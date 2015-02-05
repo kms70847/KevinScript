@@ -24,6 +24,12 @@ compile = ast.get_compiler(
 with open(sys.argv[1]) as file:
     program_text = file.read()
 
+program_text = ''
+
+if "--strict" not in sys.argv[2:]:
+    if not program_text.endswith(";"):
+        program_text = program_text + ";"
+
 tree = compile(program_text)
 
 scopes = [builtins]
