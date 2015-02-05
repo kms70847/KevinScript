@@ -54,3 +54,39 @@ expect_runs("""
 expect_runs('if (True){;}')
 expect_output('if (True){print "success";}', "success")
 expect_output('if (False){;} else{print "success";}', "success")
+
+#functions - declaration, `return`, evaluation
+expect_runs('function frob(){;}')
+expect_output("""
+    function frob(x){
+        return x;
+    }
+    print frob(23)
+    """,
+    "23"
+)
+
+#expression statements
+expect_runs('True')
+
+#empty statements
+expect_runs(';;;')
+
+#enclosure expressions
+expect_runs('(True)')
+expect_runs('(((((True)))))')
+
+#arithmetic
+expect_output("print 1+1", "2")
+expect_output("print 42-23", "19")
+expect_output("print 23*2", "46")
+expect_output("print 42/2", "21")
+expect_output("print 23%2", "1")
+expect_output("print 0==0", "True")
+expect_output("print 23 < 42", "True")
+expect_output("print 42 > 23", "True")
+expect_runs("1 * 1 + 1 / 1 - 1 < 1")
+
+#attribute getting/setting
+expect_output("foo = Object(); foo.bar=23; print foo.bar", "23")
+expect_output("foo = Object(); foo.bar=function(){return 23;}; print foo.bar()", "23")
