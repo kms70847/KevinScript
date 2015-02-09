@@ -12,14 +12,14 @@ import ks
 def expect_runs(code):
     try:
         ks.execute(code)
-    except:
-        raise Exception("Expected code {} to run successfully, got exception instead".format(repr(code)))
+    except Exception as e:
+        raise Exception("Expected code {} to run successfully, got exception instead".format(repr(code), repr(str(e))))
 
 def expect_output(code, output):
     try:
         result = ks.check_output(code)
-    except:
-        raise Exception("Expected code {} to produce output {}, got exception instead".format(repr(code), repr(output)))
+    except Exception as e:
+        raise Exception("Expected code {} to produce output {}, got exception {} instead".format(repr(code), repr(output), repr(str(e))))
     assert result == output, "Expected code {} to produce output {}, got {} instead".format(repr(code), repr(output), repr(result))
 
 expect_runs("")
