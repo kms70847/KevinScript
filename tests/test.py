@@ -13,7 +13,7 @@ def expect_runs(code):
     try:
         ks.execute(code)
     except Exception as e:
-        raise Exception("Expected code {} to run successfully, got exception instead".format(repr(code), repr(str(e))))
+        raise Exception("Expected code {} to run successfully, got exception {} instead".format(repr(code), repr(str(e))))
 
 def expect_output(code, output):
     try:
