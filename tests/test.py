@@ -96,7 +96,7 @@ expect_output("foo = Object(); foo.bar=function(){return 23;}; print foo.bar()",
 
 #tests we'd like to pass for future versions
 
-#this justs prints `<List instance>` right now. We can't get the expected output
+#this just prints `<List instance>` right now. We can't get the expected output
 #until we resolve the cyclic dependency between kobjects and eval_ast, in regards
 #to executing local functions from an external function.
 #expect_output('print [1, 2, 3]', '[1, 2, 3]')
