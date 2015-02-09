@@ -150,10 +150,10 @@ def evaluate(node, scopes):
             return statement_default_return_value
 
         elif node.klass == "FunctionDeclaration":
-            if len(node.children) > 1:  # no arguments
+            if len(node.children) > 1:
                 arguments = evaluate(node.children[0], scopes)
                 body = node.children[1]
-            else:
+            else:  # no arguments
                 arguments = []
                 body = node.children[0]
             return make_Function(body, arguments, scopes)
