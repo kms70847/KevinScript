@@ -45,6 +45,7 @@ Expression -> CompExpression | FunctionDeclaration
 #function declaration style that may be used within an expression.
 #not to be confused with FunctionDeclarationStatement, which cannot.
 FunctionDeclaration -> function( FunctionDeclarationArgumentList ) { StatementList } | function() { StatementList }
-FunctionDeclarationArgumentList -> identifier | identifier , FunctionDeclarationArgumentList
+FunctionDeclarationArgumentList -> IdentifierList
 
+IdentifierList -> identifier | identifier , IdentifierList
 ExpressionList -> Expression | Expression , ExpressionList

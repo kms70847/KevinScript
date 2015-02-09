@@ -158,11 +158,7 @@ def evaluate(node, scopes):
                 body = node.children[0]
             return make_Function(body, arguments, scopes)
         elif node.klass == "FunctionDeclarationArgumentList":
-            first = node.children[0].token.value
-            if len(node.children) == 1:
-                return [first]
-            else:
-                return [first] + evaluate(node.children[1], scopes)
+            return evaluate(node.children[0], scopes)
 
         # note: this only gets evaluated for AttributeRefs not belonging to an AssignmentStatement.
         # Those nodes are handled specially in the AssignmentStatement block.
@@ -187,6 +183,8 @@ def evaluate(node, scopes):
                 raise
         elif node.klass == "ExpressionList":
             return [evaluate(child, scopes) for child in node.children]
+        elif node.klass == "IdentifierList":
+            return [child.token.value for child in node.children]
         elif node.klass in "AddExpression CompExpression MultExpression".split():
             if len(node.children) == 1:
                 return evaluate(node.children[0], scopes)

@@ -10,7 +10,7 @@ import ast
 from eval_ast import evaluate
 from kobjects import builtins
 
-reducible_nodes = ["StatementList", "ExpressionList", "KeyValueList"]
+reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList"]
 
 compile = ast.get_compiler(
     os.path.join(cur_dir, "tokens.txt"), 
