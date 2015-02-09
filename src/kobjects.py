@@ -106,7 +106,7 @@ def make_Boolean(value=False):
     return ret
 
 def make_List(items):
-    ret = make_Object("Boolean")
+    ret = make_Object("List")
     ret["private"]["items"] = items
     ret["public"]["size"] = make_Function(lambda scope: make_Integer(len(ret["private"]["items"])))
     ret["public"]["at"] = make_Function(lambda scope, idx: ret["private"]["items"][idx["private"]["value"]])
