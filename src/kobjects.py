@@ -52,7 +52,7 @@ class ObjectFactory:
             "private": {
                 "closure":[], 
                 "arguments":[], 
-                "body": lambda closure: make_String("<{} instance>".format(type_name))
+                "body": lambda closure: self.make_String("<{} instance>".format(type_name))
             },
             "public": {
                 "type": self.builtins["Function"]
@@ -126,5 +126,8 @@ class ObjectFactory:
         ret["public"]["at"] = self.make_Function(lambda scope, idx: ret["private"]["items"][idx["private"]["value"]])
         ret["public"]["append"] = self.make_Function(lambda scope, value: [self.builtins["None"], items.append(value)][0])
         ret["public"]["pop"] = self.make_Function(lambda scope: [self.builtins["None"], items.pop()][0])
+
+        obj_repr = lambda obj: self.eval_func(obj["public"]["__repr__"])["private"]["value"]
+        ret["public"]["__repr__"] = self.make_Function(lambda scope: self.make_String("[" + ", ".join(obj_repr(item) for item in items) + "]"))
         return ret
 
