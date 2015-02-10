@@ -1,5 +1,8 @@
 import ast
-from kobjects import builtins, make_String, make_Integer, make_List, make_Function
+from kobjects import ObjectFactory
+
+objectFactory = ObjectFactory()
+builtins = objectFactory.builtins
 
 def extract_identifiers(node):
     if isinstance(node, ast.Leaf):
@@ -33,7 +36,10 @@ def evaluate_function(func, scopes, argument_values):
 def get_type_name(obj):
     return obj["public"]["type"]["private"]["name"]
 
-def evaluate(node, scopes):
+def evaluate(node, scopes=None):
+    if scopes == None:
+        scopes = [builtins]
+
     def get_var(name):
         for scope in scopes[::-1]:
             if name in scope:
@@ -50,11 +56,11 @@ def evaluate(node, scopes):
 
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "number":
-            return make_Integer(int(node.token.value))
+            return objectFactory.make_Integer(int(node.token.value))
         elif node.token.klass.name == "identifier":
             return get_var(node.token.value)
         elif node.token.klass.name == "string_literal":
-            return make_String(node.token.value[1:-1])
+            return objectFactory.make_String(node.token.value[1:-1])
         else:
             raise Exception("evaluate not implemented yet for leaf {}".format(node.token))
     else:
@@ -116,7 +122,7 @@ def evaluate(node, scopes):
             seq = evaluate(node.children[1], scopes)
             size = evaluate_function(seq["public"].get("size"), scopes, [])["private"]["value"]
             for idx in range(size):
-                item = evaluate_function(seq["public"].get("at"), scopes, [make_Integer(idx)])
+                item = evaluate_function(seq["public"].get("at"), scopes, [objectFactory.make_Integer(idx)])
                 scopes[-1][identifier] = item
                 result = evaluate(node.children[2], scopes)
                 if result["returning"]:
@@ -156,7 +162,7 @@ def evaluate(node, scopes):
             else:  # no arguments
                 arguments = []
                 body = node.children[0]
-            return make_Function(body, arguments, scopes)
+            return objectFactory.make_Function(body, arguments, scopes)
         elif node.klass == "FunctionDeclarationArgumentList":
             return evaluate(node.children[0], scopes)
 
@@ -211,6 +217,6 @@ def evaluate(node, scopes):
             items = []
             if node.children:
                 items = evaluate(node.children[0], scopes)
-            return make_List(items)
+            return objectFactory.make_List(items)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))

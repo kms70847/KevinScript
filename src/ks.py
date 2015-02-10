@@ -8,7 +8,6 @@ parser_dir = os.path.join(top_dir, "lib", "parser")
 sys.path.insert(0, parser_dir)
 import ast
 from eval_ast import evaluate
-from kobjects import builtins
 
 reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList"]
 
@@ -22,8 +21,7 @@ def execute(program_text, strict=False):
     if not strict:
         program_text += ";"
     tree = compile(program_text)
-    scopes = [builtins]
-    evaluate(tree, scopes)
+    evaluate(tree)
 
 
 def check_output(*args, **kargs):
