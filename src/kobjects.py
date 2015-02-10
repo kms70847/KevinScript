@@ -80,17 +80,21 @@ class ObjectFactory:
     def make_Integer(self, value=0):
         ret = self.make_Object("Integer")
         ret["private"]["value"] = value
-        #uggggghhhh this syntax is so wordy
         #we only support ops between objects of the same type right now, but it might be nice to do more later
-        ret["public"]["__lt__"]  = self.make_Function(lambda scopes, other: self.make_Boolean(ret["private"]["value"] <  other["private"]["value"]))
-        ret["public"]["__gt__"]  = self.make_Function(lambda scopes, other: self.make_Boolean(ret["private"]["value"] >  other["private"]["value"]))
-        ret["public"]["__eq__"]  = self.make_Function(lambda scopes, other: self.make_Boolean(ret["private"]["value"] == other["private"]["value"]))
-        ret["public"]["__neq__"] = self.make_Function(lambda scopes, other: self.make_Boolean(ret["private"]["value"] != other["private"]["value"]))
-        ret["public"]["__add__"] = self.make_Function(lambda scopes, other: self.make_Integer(ret["private"]["value"] + other["private"]["value"]))
-        ret["public"]["__sub__"] = self.make_Function(lambda scopes, other: self.make_Integer(ret["private"]["value"] - other["private"]["value"]))
-        ret["public"]["__mul__"] = self.make_Function(lambda scopes, other: self.make_Integer(ret["private"]["value"] * other["private"]["value"]))
-        ret["public"]["__div__"] = self.make_Function(lambda scopes, other: self.make_Integer(ret["private"]["value"] / other["private"]["value"]))
-        ret["public"]["__mod__"] = self.make_Function(lambda scopes, other: self.make_Integer(ret["private"]["value"] % other["private"]["value"]))
+
+        def assign_operator(name, op_func, return_type_make_func):
+            value = lambda obj: obj["private"]["value"]
+            ret["public"][name] = self.make_Function(lambda scopes, other: return_type_make_func(op_func(value(ret), value(other))))
+        assign_operator("__lt__",  operator.lt, self.make_Boolean)
+        assign_operator("__gt__",  operator.gt, self.make_Boolean)
+        assign_operator("__eq__",  operator.eq, self.make_Boolean)
+        assign_operator("__neq__", operator.ne, self.make_Boolean)
+            
+        assign_operator("__add__", operator.add, self.make_Integer)
+        assign_operator("__sub__", operator.sub, self.make_Integer)
+        assign_operator("__mul__", operator.mul, self.make_Integer)
+        assign_operator("__div__", operator.div, self.make_Integer)
+        assign_operator("__mod__", operator.mod, self.make_Integer)
         ret["public"]["__repr__"] = self.make_Function(lambda scopes: self.make_String(str(ret["private"]["value"])))
         return ret
 
