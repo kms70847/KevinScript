@@ -13,7 +13,11 @@ def extract_identifiers(node):
             ret = ret + extract_identifiers(child)
         return ret
 
-def evaluate_function(func, scopes, argument_values):
+def evaluate_function(func, scopes=None, argument_values=None):
+    if scopes == None:
+        scopes = []
+    if argument_values == None:
+        argument_values = []
     if isinstance(func["private"]["body"], ast.Node):
         #pure KS func
         locals = {}
