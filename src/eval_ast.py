@@ -1,9 +1,6 @@
 import ast
 from kobjects import ObjectFactory
 
-objectFactory = ObjectFactory()
-builtins = objectFactory.builtins
-
 def extract_identifiers(node):
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "identifier":
@@ -220,3 +217,6 @@ def evaluate(node, scopes=None):
             return objectFactory.make_List(items)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))
+
+objectFactory = ObjectFactory(evaluate_function)
+builtins = objectFactory.builtins

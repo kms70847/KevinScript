@@ -3,7 +3,11 @@
 import operator
 
 class ObjectFactory:
-    def __init__(self):
+    """arguments:
+    eval_func - a function that takes a KS Function and executes it. Should have arguments (func, scopes, argument_values). (eval_ast.evaluate_function is a good candidate)
+    """
+    def __init__(self, eval_func):
+        self.eval_func = eval_func
         self.builtins = {}
 
         def connect(target, name, dest):
