@@ -21,18 +21,46 @@ class ObjectFactory:
             connect(name, "type", "Type")
             connect(name, "parent", "Object")
             self.builtins[name]["private"]["name"] = name
+            self.builtins[name]["private"]["instance_methods"] = {}
 
         self.builtins["None"] = self.make_blank()
         connect("None", "type", "Nonetype")
         connect("Object", "parent", "None")
 
-        for name in type_names:
-            self.builtins[name]["public"]["__repr__"] = (lambda n=name: self.make_Function(lambda scopes: self.make_String("<type '{}'>".format(n))))()
-        self.builtins["None"]["public"]["__repr__"] = self.make_Function(lambda scopes: self.make_String("None"))
+        self.builtins["False"] = self.make(False)
+        self.builtins["True"] = self.make(True)
 
-        self.builtins["False"] = self.make_Boolean(False)
-        self.builtins["True"] = self.make_Boolean(True)
-        self.builtins["Object"]["public"]["__call__"] = self.make_Function(lambda scope: self.make_Object())
+        obj_repr = lambda obj: self.eval_func(obj["public"]["__repr__"])["private"]["value"]
+
+        instance_methods = {
+            "Object":{
+                "__repr__":  lambda obj: "<Object instance>"
+            },
+            "String":{
+                "__repr__":  lambda obj: obj["private"]["value"]
+            },
+            "Integer":{
+                "__repr__":  lambda obj: str(obj["private"]["value"])
+            },
+            "Type":{
+                "__repr__":  lambda obj: "<type '{}'>".format(obj["private"]["name"])       
+            },
+            "Nonetype":{
+                "__repr__":  lambda obj: "None"
+            }
+        }
+
+        #doesn't really need to be a function, since we use it only once,
+        #but the alternative is to have rather ugly binding workarounds for `host_func` in the loop
+        def register_method(type, method_name, host_func):
+            func = lambda scopes, *args: self.make(host_func(*args))
+            #todo: support for builtin methods taking more than one argument
+            native_func = self.make_Function(func, ["self"])
+            self.builtins[type]["private"]["instance_methods"][method_name] = native_func
+
+        for type, methods in instance_methods.iteritems():
+            for method_name, host_func in methods.iteritems():
+                register_method(type, method_name, host_func)
 
     #functions of the form make_*** are used by the host language to construct 
     #object instances without having to invoke their type's `__call__` method.
@@ -44,58 +72,6 @@ class ObjectFactory:
     def make_Object(self, type_name="Object"):
         ret = self.make_blank()
         ret["public"]["type"] = self.builtins[type_name]
-
-        #we want to define a generic __repr__, but
-        #we can't call `make_Function` without an infinite loop.
-        #So we'll need to define the method manually.
-        repr = {
-            "private": {
-                "closure":[], 
-                "arguments":[], 
-                "body": lambda closure: self.make_String("<{} instance>".format(type_name))
-            },
-            "public": {
-                "type": self.builtins["Function"]
-            }
-        }
-        repr["public"]["__repr__"] = repr
-
-        ret["public"]["__repr__"] = repr
-        return ret
-
-    #probably don't need this just yet
-    def make_Type(self, name, instance_methods):
-        ret = self.make_Object("Type")
-        ret["public"]["parent"] = self.builtins["Object"]
-        ret["public"]["name"] = name
-        ret["public"]["instance_methods"] = instance_methods
-        return ret
-
-    def make_String(self, s=""):
-        ret = self.make_Object("String")
-        ret["private"]["value"] = s
-        ret["public"]["__repr__"] = self.make_Function(lambda scopes: ret)
-        return ret
-
-    def make_Integer(self, value=0):
-        ret = self.make_Object("Integer")
-        ret["private"]["value"] = value
-        #we only support ops between objects of the same type right now, but it might be nice to do more later
-
-        def assign_operator(name, op_func, return_type_make_func):
-            value = lambda obj: obj["private"]["value"]
-            ret["public"][name] = self.make_Function(lambda scopes, other: return_type_make_func(op_func(value(ret), value(other))))
-        assign_operator("__lt__",  operator.lt, self.make_Boolean)
-        assign_operator("__gt__",  operator.gt, self.make_Boolean)
-        assign_operator("__eq__",  operator.eq, self.make_Boolean)
-        assign_operator("__neq__", operator.ne, self.make_Boolean)
-            
-        assign_operator("__add__", operator.add, self.make_Integer)
-        assign_operator("__sub__", operator.sub, self.make_Integer)
-        assign_operator("__mul__", operator.mul, self.make_Integer)
-        assign_operator("__div__", operator.div, self.make_Integer)
-        assign_operator("__mod__", operator.mod, self.make_Integer)
-        ret["public"]["__repr__"] = self.make_Function(lambda scopes: self.make_String(str(ret["private"]["value"])))
         return ret
 
     """
@@ -117,21 +93,23 @@ class ObjectFactory:
         ret["private"]["body"] = body
         return ret
 
-    def make_Boolean(self, value=False):
-        ret = self.make_Object("Boolean")
-        ret["private"]["value"] = value
-        ret["public"]["__repr__"] = self.make_Function(lambda scopes: self.make_String("True" if ret["private"]["value"] else "False"))
-        return ret
+    """
+    turns a Python object into its equivalent KevinScript object.
+    Works on built-in scalar types and most collections.
+    Use `make_Function` for functions.
+    """
+    def make(self, value):
+        
+        d = {str: "String", int: "Integer"}
+        for host_type, native_type in d.iteritems():
+            if isinstance(value, host_type):
+                obj = self.make_Object(native_type)
+                obj["private"]["value"] = value
+                return obj
+        if isinstance(value, list):
+            obj = self.make_Object("List")
+            obj["private"]["items"] = value
+            return obj
 
-    def make_List(self, items):
-        ret = self.make_Object("List")
-        ret["private"]["items"] = items
-        ret["public"]["size"] = self.make_Function(lambda scope: self.make_Integer(len(ret["private"]["items"])))
-        ret["public"]["at"] = self.make_Function(lambda scope, idx: ret["private"]["items"][idx["private"]["value"]])
-        ret["public"]["append"] = self.make_Function(lambda scope, value: [self.builtins["None"], items.append(value)][0])
-        ret["public"]["pop"] = self.make_Function(lambda scope: [self.builtins["None"], items.pop()][0])
-
-        obj_repr = lambda obj: self.eval_func(obj["public"]["__repr__"])["private"]["value"]
-        ret["public"]["__repr__"] = self.make_Function(lambda scope: self.make_String("[" + ", ".join(obj_repr(item) for item in items) + "]"))
-        return ret
+        raise Exception("No conversion found for type {}".format(type(value)))
 

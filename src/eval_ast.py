@@ -13,11 +13,46 @@ def extract_identifiers(node):
             ret = ret + extract_identifiers(child)
         return ret
 
+def get_attribute(obj, name):
+    def iter_types(type):
+        while True:
+            yield type
+            next = type["public"]["parent"]
+            if type == next: break
+            type = next
+
+    """
+    creates a version of `func` that already has `obj` bound to the first argument.
+    """
+    def create_bound_method(func, obj):
+        arg_names = func["private"]["arguments"]
+        body = lambda closure, *args: evaluate_function(func, None, (obj,) + args)
+        return objectFactory.make_Function(body, arg_names[1:])
+        
+    #see if the attribute is directly on the object
+    if name in obj["public"]:
+        return obj[name]
+    
+    #see if the attribute is an instance method on the object's type chain
+    for type in iter_types(obj["public"]["type"]):
+        if "instance_methods" not in type["private"]:
+            #this should only happen for poorly implemented built-in types
+            raise Exception("type {} has no `instance_methods` collection".format(type["private"]["name"]))
+        func = type["private"]["instance_methods"].get(name)
+        if not func: continue
+        return create_bound_method(func, obj)
+
+    #Couldn't find the attribute!
+    return None
+        
+            
+
 def evaluate_function(func, scopes=None, argument_values=None):
     if scopes == None:
         scopes = []
     if argument_values == None:
         argument_values = []
+    assert all(isinstance(value, dict) for value in argument_values), "expected native objects as arguments, got {} instead".format([type(x) for x in argument_values])
     if isinstance(func["private"]["body"], ast.Node):
         #pure KS func
         locals = {}
@@ -57,11 +92,11 @@ def evaluate(node, scopes=None):
 
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "number":
-            return objectFactory.make_Integer(int(node.token.value))
+            return objectFactory.make(int(node.token.value))
         elif node.token.klass.name == "identifier":
             return get_var(node.token.value)
         elif node.token.klass.name == "string_literal":
-            return objectFactory.make_String(node.token.value[1:-1])
+            return objectFactory.make(node.token.value[1:-1])
         else:
             raise Exception("evaluate not implemented yet for leaf {}".format(node.token))
     else:
@@ -97,7 +132,7 @@ def evaluate(node, scopes=None):
             return statement_default_return_value
         elif node.klass == "PrintStatement":
             obj = evaluate(node.children[0], scopes)
-            method = obj["public"].get("__repr__")
+            method = get_attribute(obj, "__repr__")
             assert method, "{} object has no method __repr__".format(get_type_name(obj))
             result = evaluate_function(method, scopes, [])
             assert get_type_name(result) == "String", "expected repr to return String, got {}".format(get_type_name(result))
@@ -123,7 +158,7 @@ def evaluate(node, scopes=None):
             seq = evaluate(node.children[1], scopes)
             size = evaluate_function(seq["public"].get("size"), scopes, [])["private"]["value"]
             for idx in range(size):
-                item = evaluate_function(seq["public"].get("at"), scopes, [objectFactory.make_Integer(idx)])
+                item = evaluate_function(seq["public"].get("at"), scopes, [objectFactory.make(idx)])
                 scopes[-1][identifier] = item
                 result = evaluate(node.children[2], scopes)
                 if result["returning"]:
@@ -218,7 +253,7 @@ def evaluate(node, scopes=None):
             items = []
             if node.children:
                 items = evaluate(node.children[0], scopes)
-            return objectFactory.make_List(items)
+            return objectFactory.make(items)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))
 
