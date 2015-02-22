@@ -42,7 +42,14 @@ class ObjectFactory:
             "Integer":{
                 "__repr__": lambda obj: str(obj["private"]["value"]),
                 "__lt__"  : lambda obj, other: obj["private"]["value"] < other["private"]["value"],
-                "__add__" : lambda obj, other: obj["private"]["value"] + other["private"]["value"]
+                "__gt__"  : lambda obj, other: obj["private"]["value"] > other["private"]["value"],
+                "__eq__"  : lambda obj, other: obj["private"]["value"] == other["private"]["value"],
+                "__add__" : lambda obj, other: obj["private"]["value"] + other["private"]["value"],
+                "__sub__" : lambda obj, other: obj["private"]["value"] - other["private"]["value"],
+                "__mul__" : lambda obj, other: obj["private"]["value"] * other["private"]["value"],
+                "__div__" : lambda obj, other: obj["private"]["value"] / other["private"]["value"],
+                "__mod__" : lambda obj, other: obj["private"]["value"] % other["private"]["value"]
+
             },
             "Boolean":{
                 "__repr__": lambda obj: "True" if obj is self.builtins["True"] else "False"
