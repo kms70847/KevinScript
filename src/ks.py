@@ -23,21 +23,34 @@ def execute(program_text, strict=False):
     tree = compile(program_text)
     evaluate(tree)
 
-
 def check_output(*args, **kargs):
     """
     #behaves identically to `execute`, 
     except it suppresses all print statements, 
     and returns a string containing what would have been printed.
     """
-    s = StringIO.StringIO()
+    class SplitIO:
+        def __init__(self, *channels):
+            self.channels = channels
+        def write(self, data):
+            for channel in self.channels:
+                channel.write(data)
+
+    verbose = kargs.pop("verbose", False)
+    string_io = StringIO.StringIO()
     old_stdout = sys.stdout
-    sys.stdout = s
+
+    if verbose:
+        sys.stdout = SplitIO(string_io, sys.stdout)
+    else:
+        sys.stdout = string_io
+
     try:
         execute(*args, **kargs)
     finally:
         sys.stdout = old_stdout
-    return s.getvalue().rstrip()
+
+    return string_io.getvalue().rstrip()
     
 
 if __name__ == "__main__":
