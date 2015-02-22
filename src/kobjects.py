@@ -27,26 +27,28 @@ class ObjectFactory:
         connect("None", "type", "Nonetype")
         connect("Object", "parent", "None")
 
-        self.builtins["False"] = self.make(False)
-        self.builtins["True"] = self.make(True)
-
-        obj_repr = lambda obj: self.eval_func(obj["public"]["__repr__"])["private"]["value"]
+        self.builtins["False"] = self.make_Object("Boolean")
+        self.builtins["True"] = self.make_Object("Boolean")
 
         instance_methods = {
             "Object":{
-                "__repr__":  lambda obj: "<Object instance>"
+                "__repr__": lambda obj: "<Object instance>"
             },
             "String":{
-                "__repr__":  lambda obj: obj["private"]["value"]
+                "__repr__": lambda obj: obj["private"]["value"]
             },
             "Integer":{
-                "__repr__":  lambda obj: str(obj["private"]["value"])
+                "__repr__": lambda obj: str(obj["private"]["value"]),
+                "__lt__"  : lambda obj, other: obj["private"]["value"] < other["private"]["value"]
+            },
+            "Boolean":{
+                "__repr__": lambda obj: "True" if obj is self.builtins["True"] else "False"
             },
             "Type":{
-                "__repr__":  lambda obj: "<type '{}'>".format(obj["private"]["name"])       
+                "__repr__": lambda obj: "<type '{}'>".format(obj["private"]["name"])       
             },
             "Nonetype":{
-                "__repr__":  lambda obj: "None"
+                "__repr__": lambda obj: "None"
             }
         }
 
@@ -99,17 +101,21 @@ class ObjectFactory:
     Use `make_Function` for functions.
     """
     def make(self, value):
-        
+        if isinstance(value, list):
+            obj = self.make_Object("List")
+            obj["private"]["items"] = value
+            return obj
+
+        if isinstance(value, bool):
+            return self.builtins["True" if value else "False"]
+
+        #some types are just simple wrappers around host objects, with the value stored in the private dict.
         d = {str: "String", int: "Integer"}
         for host_type, native_type in d.iteritems():
             if isinstance(value, host_type):
                 obj = self.make_Object(native_type)
                 obj["private"]["value"] = value
                 return obj
-        if isinstance(value, list):
-            obj = self.make_Object("List")
-            obj["private"]["items"] = value
-            return obj
 
         raise Exception("No conversion found for type {}".format(type(value)))
 

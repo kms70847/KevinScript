@@ -18,7 +18,7 @@ def get_attribute(obj, name):
         while True:
             yield type
             next = type["public"]["parent"]
-            if type == next: break
+            if next is builtins["None"]: break
             type = next
 
     """
@@ -146,7 +146,7 @@ def evaluate(node, scopes=None):
                 cond = evaluate(node.children[0], scopes)
                 if not get_type_name(cond) == "Boolean":
                     cond = cond.bool()
-                if not cond["private"]["value"]:
+                if cond is not builtins["True"]:
                     break
                 result = evaluate(node.children[1], scopes)
                 if result["returning"]:
@@ -245,7 +245,7 @@ def evaluate(node, scopes=None):
                     "==": "__eq__",
                     "!=": "__neq__"
                 }[operator]
-                method = left["public"].get(func_name)
+                method = get_attribute(left, func_name)
                 assert method, "object {} has no method {}".format(get_type_name(left), func_name)
 
                 return evaluate_function(method, scopes, [right])
