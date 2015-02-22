@@ -30,6 +30,8 @@ class ObjectFactory:
         self.builtins["False"] = self.make_Object("Boolean")
         self.builtins["True"] = self.make_Object("Boolean")
 
+
+        #append `~` to the name of your method if you don't want its return value to be run through `self.make`
         instance_methods = {
             "Object":{
                 "__repr__": lambda obj: "<Object instance>"
@@ -50,13 +52,21 @@ class ObjectFactory:
             },
             "Nonetype":{
                 "__repr__": lambda obj: "None"
+            },
+            "List":{
+                "size": lambda obj: len(obj["private"]["items"]),
+                "at~": lambda obj, idx: obj["private"]["items"][idx["private"]["value"]]
             }
         }
 
         #doesn't really need to be a function, since we use it only once,
         #but the alternative is to have rather ugly binding workarounds for `host_func` in the loop
         def register_method(type, method_name, host_func):
-            func = lambda scopes, *args: self.make(host_func(*args))
+            if method_name.endswith("~"):
+                method_name = method_name.rstrip("~")
+                func = lambda scopes, *args: host_func(*args)
+            else:
+                func = lambda scopes, *args: self.make(host_func(*args))
             #todo: support for builtin methods taking more than one argument
             native_func = self.make_Function(func, ["self"])
             self.builtins[type]["private"]["instance_methods"][method_name] = native_func
