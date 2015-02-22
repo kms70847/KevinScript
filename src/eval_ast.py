@@ -173,7 +173,7 @@ def evaluate(node, scopes=None):
             if not get_type_name(cond) == "Boolean":
                 cond = cond.bool()
             assert get_type_name(cond) == "Boolean", "expected Boolean, got {}".format(get_type_name(cond))
-            if cond["private"]["value"]:
+            if cond is builtins["True"]:
                 result = evaluate(node.children[1], scopes)
                 if result["returning"]:
                     return result
