@@ -45,7 +45,8 @@ def get_attribute(obj, name):
     #Couldn't find the attribute!
     return None
         
-            
+def has_attribute(obj, name):
+    return get_attribute(obj, name) is not None
 
 def evaluate_function(func, scopes=None, argument_values=None):
     if scopes == None:
@@ -219,8 +220,8 @@ def evaluate(node, scopes=None):
             else:
                 arguments = evaluate(node.children[1], scopes)
             is_func = lambda obj: all(attr in obj["private"] for attr in ("body", "arguments", "closure"))
-            while "__call__" in callable["public"] and not is_func(callable):
-                callable = callable["public"]["__call__"]
+            while has_attribute(callable, "__call__") and not is_func(callable):
+                callable = get_attribute(callable, "__call__")
             assert is_func(callable), "expected callable, got {} at {}".format(get_type_name(callable), line(node))
             try:
                 return evaluate_function(callable, scopes, arguments)
