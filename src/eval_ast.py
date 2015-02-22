@@ -156,7 +156,11 @@ def evaluate(node, scopes=None):
         elif node.klass == "ForStatement":
             identifier = node.children[0].token.value
             seq = evaluate(node.children[1], scopes)
-            size = evaluate_function(seq["public"].get("size"), scopes, [])["private"]["value"]
+            size_func = get_attribute(seq, "size")
+            at_func = get_attribute(seq, "at")
+            assert size_func, "Can't iterate over type {} with no `size` function".format(get_type_name(seq))
+            assert at_func, "Can't iterate over type {} with no `at` function".format(get_type_name(seq))
+            size = evaluate_function(size_func, scopes, [])["private"]["value"]
             for idx in range(size):
                 item = evaluate_function(seq["public"].get("at"), scopes, [objectFactory.make(idx)])
                 scopes[-1][identifier] = item
