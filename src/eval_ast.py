@@ -162,7 +162,7 @@ def evaluate(node, scopes=None):
             assert at_func, "Can't iterate over type {} with no `at` function".format(get_type_name(seq))
             size = evaluate_function(size_func, scopes, [])["private"]["value"]
             for idx in range(size):
-                item = evaluate_function(seq["public"].get("at"), scopes, [objectFactory.make(idx)])
+                item = evaluate_function(at_func, scopes, [objectFactory.make(idx)])
                 scopes[-1][identifier] = item
                 result = evaluate(node.children[2], scopes)
                 if result["returning"]:
