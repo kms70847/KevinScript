@@ -92,6 +92,11 @@ expect_output("print 23 < 42", "True")
 expect_output("print 42 > 23", "True")
 expect_runs("1 * 1 + 1 / 1 - 1 < 1")
 
+#builtin type instantiation
+expect_output("print Object()", "<Object instance>")
+expect_output("print Integer()", "0")
+expect_output("print String()", "\"\"")
+
 #attribute getting/setting
 expect_output("foo = Object(); foo.bar=23; print foo.bar", "23")
 expect_output("foo = Object(); foo.bar=function(){return 23;}; print foo.bar()", "23")
