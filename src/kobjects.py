@@ -141,3 +141,37 @@ class ObjectFactory:
 
         raise Exception("No conversion found for type {}".format(type(value)))
 
+    def get_attribute(self, obj, name):
+        def iter_types(type):
+            while True:
+                yield type
+                next = type["public"]["parent"]
+                if next is self.builtins["None"]: break
+                type = next
+
+        """
+        creates a version of `func` that already has `obj` bound to the first argument.
+        """
+        def create_bound_method(func, obj):
+            arg_names = func["private"]["arguments"]
+            body = lambda closure, *args: self.eval_func(func, None, (obj,) + args)
+            return self.make_Function(body, arg_names[1:])
+            
+        #see if the attribute is directly on the object
+        if name in obj["public"]:
+            return obj[name]
+        
+        #see if the attribute is an instance method on the object's type chain
+        for type in iter_types(obj["public"]["type"]):
+            if "instance_methods" not in type["private"]:
+                #this should only happen for poorly implemented built-in types
+                raise Exception("type {} has no `instance_methods` collection".format(type["private"]["name"]))
+            func = type["private"]["instance_methods"].get(name)
+            if not func: continue
+            return create_bound_method(func, obj)
+
+        #Couldn't find the attribute!
+        return None
+            
+    def has_attribute(self, obj, name):
+        return self.get_attribute(obj, name) is not None

@@ -13,41 +13,6 @@ def extract_identifiers(node):
             ret = ret + extract_identifiers(child)
         return ret
 
-def get_attribute(obj, name):
-    def iter_types(type):
-        while True:
-            yield type
-            next = type["public"]["parent"]
-            if next is builtins["None"]: break
-            type = next
-
-    """
-    creates a version of `func` that already has `obj` bound to the first argument.
-    """
-    def create_bound_method(func, obj):
-        arg_names = func["private"]["arguments"]
-        body = lambda closure, *args: evaluate_function(func, None, (obj,) + args)
-        return objectFactory.make_Function(body, arg_names[1:])
-        
-    #see if the attribute is directly on the object
-    if name in obj["public"]:
-        return obj[name]
-    
-    #see if the attribute is an instance method on the object's type chain
-    for type in iter_types(obj["public"]["type"]):
-        if "instance_methods" not in type["private"]:
-            #this should only happen for poorly implemented built-in types
-            raise Exception("type {} has no `instance_methods` collection".format(type["private"]["name"]))
-        func = type["private"]["instance_methods"].get(name)
-        if not func: continue
-        return create_bound_method(func, obj)
-
-    #Couldn't find the attribute!
-    return None
-        
-def has_attribute(obj, name):
-    return get_attribute(obj, name) is not None
-
 def evaluate_function(func, scopes=None, argument_values=None):
     if scopes == None:
         scopes = []
@@ -265,3 +230,5 @@ def evaluate(node, scopes=None):
 
 objectFactory = ObjectFactory(evaluate_function)
 builtins = objectFactory.builtins
+get_attribute = objectFactory.get_attribute
+has_attribute = objectFactory.has_attribute
