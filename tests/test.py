@@ -80,7 +80,7 @@ expect_runs("1 * 1 + 1 / 1 - 1 < 1")
 #builtin type instantiation
 expect_output("print Object()", "<Object instance>")
 expect_output("print Integer()", "0")
-expect_output("print String()", "\"\"")
+expect_output("print String()", "")
 
 #attribute getting/setting
 expect_output("foo = Object(); foo.bar=23; print foo.bar", "23")
