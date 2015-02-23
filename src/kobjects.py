@@ -77,8 +77,8 @@ class ObjectFactory:
                 func = lambda scopes, *args: self.make(host_func(*args))
             #accessing `func_code` doesn't necessarily work for all implementations of Python,
             #so so this section will need refactoring if we want radical compatibility in the future.
-            num_args = func.func_code.co_argcount
-            arg_names = func.func_code.co_varnames[:num_args]
+            num_args = host_func.func_code.co_argcount
+            arg_names = host_func.func_code.co_varnames[:num_args]
             native_func = self.make_Function(func, arg_names)
             self.builtins[type]["private"]["instance_methods"][method_name] = native_func
 
