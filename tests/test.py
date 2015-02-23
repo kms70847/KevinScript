@@ -40,21 +40,6 @@ expect_output('print Object', "<type 'Object'>")
 #assignment statements
 expect_runs("foo = 23")
 
-#while loops
-expect_runs("""
-    i = 0;
-    while(i < 10){
-        i = i + 1;
-    }
-""")
-
-#for loops
-expect_runs("""
-    for(i in [4,8,15,16,23]){
-        ;
-    }
-""")
-
 #if statements
 expect_runs('if (True){;}')
 expect_output('if (True){print "success";}', "success")
@@ -100,6 +85,21 @@ expect_output("print String()", "\"\"")
 #attribute getting/setting
 expect_output("foo = Object(); foo.bar=23; print foo.bar", "23")
 expect_output("foo = Object(); foo.bar=function(){return 23;}; print foo.bar()", "23")
+
+#while loops
+expect_runs("""
+    i = 0;
+    while(i < 10){
+        i = i + 1;
+    }
+""")
+
+#for loops
+expect_runs("""
+    for(i in [4,8,15,16,23]){
+        ;
+    }
+""")
 
 
 #tests we'd like to pass for future versions
