@@ -55,7 +55,8 @@ class ObjectFactory:
                 "__repr__": lambda obj: "True" if obj is self.builtins["True"] else "False"
             },
             "Type":{
-                "__repr__": lambda obj: "<type '{}'>".format(obj["private"]["name"])       
+                "__repr__": lambda obj: "<type '{}'>".format(obj["private"]["name"]),
+                "__call__~": lambda obj: self.make_Object("Object")
             },
             "Nonetype":{
                 "__repr__": lambda obj: "None"
