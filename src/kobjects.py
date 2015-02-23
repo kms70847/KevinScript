@@ -30,16 +30,28 @@ class ObjectFactory:
         self.builtins["False"] = self.make_Object("Boolean")
         self.builtins["True"] = self.make_Object("Boolean")
 
+        def call_type_instance(type_instance):
+            ret = self.make_Object(type_instance["private"]["name"])
+            init = self.get_attribute(ret, "__init__")
+            assert init
+            #todo: support for init functions with arguments
+            self.eval_func(init)
+            return ret
+        def init_obj(obj, value):
+            obj["private"]["value"] = value
 
         #append `~` to the name of your method if you don't want its return value to be run through `self.make`
         instance_methods = {
             "Object":{
-                "__repr__": lambda obj: "<Object instance>"
+                "__repr__": lambda obj: "<Object instance>",
+                "__init__": lambda obj: None
             },
             "String":{
+                "__init__": lambda obj: init_obj(obj, ""),
                 "__repr__": lambda obj: obj["private"]["value"]
             },
             "Integer":{
+                "__init__": lambda obj: init_obj(obj, 0),
                 "__repr__": lambda obj: str(obj["private"]["value"]),
                 "__lt__"  : lambda obj, other: obj["private"]["value"] < other["private"]["value"],
                 "__gt__"  : lambda obj, other: obj["private"]["value"] > other["private"]["value"],
@@ -56,7 +68,7 @@ class ObjectFactory:
             },
             "Type":{
                 "__repr__": lambda obj: "<type '{}'>".format(obj["private"]["name"]),
-                "__call__~": lambda obj: self.make_Object("Object")
+                "__call__~": call_type_instance
             },
             "Nonetype":{
                 "__repr__": lambda obj: "None"
@@ -130,6 +142,9 @@ class ObjectFactory:
 
         if isinstance(value, bool):
             return self.builtins["True" if value else "False"]
+
+        if value is None:
+            return self.builtins["None"]
 
         #some types are just simple wrappers around host objects, with the value stored in the private dict.
         d = {str: "String", int: "Integer"}
