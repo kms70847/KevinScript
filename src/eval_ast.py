@@ -54,7 +54,7 @@ def evaluate_function(func, scopes=None, argument_values=None):
     if argument_values == None:
         argument_values = []
     assert all(isinstance(value, dict) for value in argument_values), "expected native objects as arguments, got {} instead".format([type(x) for x in argument_values])
-    assert len(argument_values) == len(func["private"]["arguments"]), "expected {} argument(s) for function call, got {}".format(len(argument_values), len(func["private"]["arguments"]))
+    assert len(argument_values) == len(func["private"]["arguments"]), "expected {} argument(s) for function call, got {}".format(len(func["private"]["arguments"]), len(argument_values))
     if isinstance(func["private"]["body"], ast.Node):
         #pure KS func
         locals = {}
