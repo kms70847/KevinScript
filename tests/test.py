@@ -101,6 +101,11 @@ expect_runs("""
     }
 """)
 
+expect_output("""
+    Fred = Type("Fred", Object, ["__init__", function(self){self.frob=23;}]);
+    x = Fred();
+    print x.frob;
+""", '23')
 #tests we'd like to pass for future versions
 #argument unpacking
 #expect_runs("function frob(*args){;}")

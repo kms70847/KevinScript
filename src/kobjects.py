@@ -30,6 +30,15 @@ class ObjectFactory:
         self.builtins["False"] = self.make_Object("Boolean")
         self.builtins["True"] = self.make_Object("Boolean")
 
+
+        #used to create user-defined types
+        def create_type(obj, name, parent, *name_function_pairs):
+            obj["public"]["parent"] = parent
+            obj["private"]["name"] = name["private"]["value"]
+            obj["private"]["instance_methods"] = {}
+            for pair in name_function_pairs:
+                func_name, func = pair["private"]["items"]
+                obj["private"]["instance_methods"][func_name["private"]["value"]] = func
         def call_type_instance(type_instance, *args):
             ret = self.make_Object(type_instance["private"]["name"])
             init = self.get_attribute(ret, "__init__")
@@ -67,7 +76,8 @@ class ObjectFactory:
             },
             "Type":{
                 "__repr__": lambda obj: "<type '{}'>".format(obj["private"]["name"]),
-                "__call__~": call_type_instance
+                "__call__~": call_type_instance,
+                "__init__": create_type
             },
             "Nonetype":{
                 "__repr__": lambda obj: "None"
