@@ -30,12 +30,11 @@ class ObjectFactory:
         self.builtins["False"] = self.make_Object("Boolean")
         self.builtins["True"] = self.make_Object("Boolean")
 
-        def call_type_instance(type_instance):
+        def call_type_instance(type_instance, *args):
             ret = self.make_Object(type_instance["private"]["name"])
             init = self.get_attribute(ret, "__init__")
             assert init
-            #todo: support for init functions with arguments
-            self.eval_func(init)
+            self.eval_func(init, argument_values=args)
             return ret
         def init_obj(obj, value):
             obj["private"]["value"] = value
