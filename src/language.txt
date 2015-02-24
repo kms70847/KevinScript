@@ -50,6 +50,19 @@ FunctionDeclarationArgumentList -> IdentifierList
 IdentifierList -> identifier | identifier , IdentifierList
 ExpressionList -> Expression | Expression , ExpressionList
 
+mult_operator -> mul | div | mod
+add_operator -> add | sub
+comp_operator -> ne | eq | gt | lt
+mul -> *
+div -> /
+mod -> %
+add -> +
+sub -> -
+ne -> !=
+eq -> ==
+gt -> >
+lt -> <
+
 #proposed syntax for potential class feature
 #Statement -> ClassDeclarationStatement
 #ClassDeclarationStatement -> class identifier { FunctionDeclarationStatementList } | class identifier ( identifier ) { FunctionDeclarationStatementList }

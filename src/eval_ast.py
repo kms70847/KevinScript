@@ -203,19 +203,9 @@ def evaluate(node, scopes=None):
                 return evaluate(node.children[0], scopes)
             else:
                 left = evaluate(node.children[0], scopes)
-                operator = node.children[1].token.value
+                operator = node.children[1].children[0].klass
                 right = evaluate(node.children[2], scopes)
-                func_name = {
-                    "+": "__add__",
-                    "-": "__sub__",
-                    "*": "__mul__",
-                    "/": "__div__",
-                    "%": "__mod__",
-                    ">": "__gt__",
-                    "<": "__lt__",
-                    "==": "__eq__",
-                    "!=": "__neq__"
-                }[operator]
+                func_name = "__" + operator + "__"
                 method = get_attribute(left, func_name)
                 assert method, "object {} has no method {}".format(get_type_name(left), func_name)
 
