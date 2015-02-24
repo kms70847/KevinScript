@@ -101,6 +101,7 @@ expect_runs("""
     }
 """)
 
-
 #tests we'd like to pass for future versions
-#none right now :-)
+#argument unpacking
+#expect_runs("function frob(*args){;}")
+#expect_runs("function frob(x, *args){;}")
