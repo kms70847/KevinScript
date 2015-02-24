@@ -36,7 +36,7 @@ def check_output(*args, **kargs):
             for channel in self.channels:
                 channel.write(data)
 
-    verbose = kargs.pop("verbose", False)
+    verbose = kargs.pop("verbose", True)
     string_io = StringIO.StringIO()
     old_stdout = sys.stdout
 
