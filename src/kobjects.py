@@ -181,7 +181,7 @@ class ObjectFactory:
             
         #see if the attribute is directly on the object
         if name in obj["public"]:
-            return obj[name]
+            return obj["public"][name]
         
         #see if the attribute is an instance method on the object's type chain
         for type in iter_types(obj["public"]["type"]):
