@@ -81,7 +81,7 @@ def evaluate(node, scopes=None):
             if result["returning"]:
                 return result
             return statement_default_return_value
-        if node.klass == "StatementList":
+        elif node.klass == "StatementList":
             for child in node.children:
                 ret = evaluate(child, scopes)
                 if ret["returning"]:
@@ -150,14 +150,14 @@ def evaluate(node, scopes=None):
                 if result["returning"]:
                     return result
             return statement_default_return_value
-        if node.klass == "FunctionDeclarationStatement":
+        elif node.klass == "FunctionDeclarationStatement":
             # function statements, ex. `function frob(x){return x;}`,
             # are just syntactic sugar for ex. `frob = function(x){return x;};`
             func = ast.Node("FunctionDeclaration", node.children[1:])
             id = node.children[0]
             assignment = ast.Node("AssignmentStatement", [id, func])
             return evaluate(assignment, scopes)
-        if node.klass == "ExpressionStatement":
+        elif node.klass == "ExpressionStatement":
             evaluate(node.children[0], scopes)
             return statement_default_return_value
         elif node.klass == "EmptyStatement":
