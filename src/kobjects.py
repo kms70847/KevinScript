@@ -41,7 +41,7 @@ class ObjectFactory:
                 func_name, func = seq[i], seq[i+1]
                 obj["private"]["instance_methods"][func_name["private"]["value"]] = func
         def call_type_instance(type_instance, *args):
-            ret = self.make_Object(type_instance["private"]["name"])
+            ret = self.make_Object(type_instance)
             init = self.get_attribute(ret, "__init__")
             assert init
             self.eval_func(init, argument_values=args)
@@ -112,9 +112,14 @@ class ObjectFactory:
     def make_blank(self):
         return {"public": {}, "private": {}}
 
-    def make_Object(self, type_name="Object"):
+    #creates an object of a given type.
+    #argument may be the string name of the type, if it is a built-in type;
+    #or it may be a direct reference to the type.
+    def make_Object(self, type_):
+        if isinstance(type_, str):
+            type_ = self.builtins[type_]
         ret = self.make_blank()
-        ret["public"]["type"] = self.builtins[type_name]
+        ret["public"]["type"] = type_
         return ret
 
     """
