@@ -65,5 +65,6 @@ lt -> <
 
 #proposed syntax for potential class feature
 Statement -> ClassDeclarationStatement
-ClassDeclarationStatement -> class identifier { FunctionDeclarationStatementList } | class identifier ( identifier ) { FunctionDeclarationStatementList }
+ClassDeclarationStatement -> class ClassHeader { FunctionDeclarationStatementList } | class ClassHeader { }
+ClassHeader -> identifier | identifier ( identifier )
 FunctionDeclarationStatementList -> FunctionDeclarationStatement | FunctionDeclarationStatement FunctionDeclarationStatementList

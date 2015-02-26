@@ -47,7 +47,7 @@ def get_type_name(obj):
 creates an AssignmentStatement node of the form `className = Type('classname', parent, ['firstname', function(){...}, 'secondname', function(){...}]
 arguments:
     class_name - the name of the class. Must be a Token.
-    parent_name - the name of the class' parent. Must be a Token.
+    parent_name - the name of the class' parent. Must be a Token or None.
     function_names - a list of the class' methods' names. Must be Tokens.
     function_nodes - a list of the class' methods. Must be Nodes of the FunctionDeclaration klass.
 """
@@ -76,6 +76,8 @@ def make_type_call_node(class_name, parent_name, function_names, function_nodes)
 
 
     type_class_identifier = lex.Token(lex.LiteralTokenRule("identifier"), "Type")
+    if parent_name is None: 
+        parent_name = lex.Token(lex.LiteralTokenRule("identifier"), "Object")
     list_literal_contents = []
     for function_name, function_node in zip(function_names, function_nodes):
         list_literal_contents.append(make_string_literal_node(function_name))
@@ -210,16 +212,17 @@ def evaluate(node, scopes=None):
             assignment = ast.Node("AssignmentStatement", [id, func])
             return evaluate(assignment, scopes)
         elif node.klass == "ClassDeclarationStatement":
-            class_name = node.children[0].token
-            if len(node.children) == 2: raise Exception("parent-less class declaration not implemented yet")
-            parent_name = node.children[1].token
+            header = node.children[0]
+            class_name = header.children[0].token
+            parent_name = header.children[1].token if len(header.children) > 1 else None
             function_names, function_nodes = [], []
-            declaration_list = node.children[-1]
-            for declaration_statement in declaration_list.children:
-                name = declaration_statement.children[0].token
-                func = ast.Node("FunctionDeclaration", declaration_statement.children[1:])
-                function_names.append(name)
-                function_nodes.append(func)
+            if len(node.children) > 1:
+                declaration_list = node.children[-1]
+                for declaration_statement in declaration_list.children:
+                    name = declaration_statement.children[0].token
+                    func = ast.Node("FunctionDeclaration", declaration_statement.children[1:])
+                    function_names.append(name)
+                    function_nodes.append(func)
             type_call_node = make_type_call_node(class_name, parent_name, function_names, function_nodes)
             return evaluate(type_call_node, scopes)
         elif node.klass == "ExpressionStatement":
