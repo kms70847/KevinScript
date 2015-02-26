@@ -202,7 +202,7 @@ def evaluate(node, scopes=None):
         elif node.klass == "AttributeRef":
             obj = evaluate(node.children[0], scopes)
             attribute_name = node.children[1].token.value
-            return obj["public"][attribute_name]
+            return get_attribute(obj, attribute_name)
         elif node.klass == "Call":
             callable = evaluate(node.children[0], scopes)
             if len(node.children) == 1:
