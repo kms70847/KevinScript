@@ -78,6 +78,8 @@ class Token:
 
     def __repr__(self):
         return "Token({}, {}, {})".format(repr(self.klass.name), repr(self.value), self.position)
+    def copy(self):
+        return Token(self.klass, self.value, self.position)
 
 
 def lex(text, token_rules):
