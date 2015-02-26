@@ -110,7 +110,7 @@ expect_output("""
 
 #type call with multiple methods
 expect_output("""
-    Fred = Type("Fred", Object, ["__init__", function(self){self.frob=23;}, "durf", function(self){return 2;}]);
+    Fred = Type("Fred", Object, ["__init__", function(self){self.frob=2;}, "durf", function(self){return 2;}]);
     x = Fred();
     print x.frob + x.durf();
 """, '4')
