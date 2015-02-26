@@ -101,11 +101,46 @@ expect_runs("""
     }
 """)
 
+#type call
 expect_output("""
     Fred = Type("Fred", Object, ["__init__", function(self){self.frob=23;}]);
     x = Fred();
     print x.frob;
 """, '23')
+
+#type call with multiple methods
+expect_output("""
+    Fred = Type("Fred", Object, ["__init__", function(self){self.frob=23;}, "durf", function(self){return 2;}]);
+    x = Fred();
+    print x.frob + x.durf();
+""", '4')
+
+#class statement
+expect_output("""
+    class Fred{
+        function __init__(self){
+            self.frob = 23;
+        }
+    };
+    x = Fred();
+    print x.frob;
+""", '23')
+
+#class statement with multiple methods
+expect_output("""
+    class Fred{
+        function __init__(self){
+            self.frob = 2;
+        }
+        function durf(self){
+            return 2;
+        }
+    };
+    x = Fred();
+    print x.frob + x.durf();
+""", '4')
+
+
 #tests we'd like to pass for future versions
 #argument unpacking
 #expect_runs("function frob(*args){;}")

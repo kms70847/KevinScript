@@ -157,6 +157,29 @@ def evaluate(node, scopes=None):
             id = node.children[0]
             assignment = ast.Node("AssignmentStatement", [id, func])
             return evaluate(assignment, scopes)
+        elif node.klass == "ClassDeclarationStatement":
+            #this is a pretty ugly implementation.
+            #we tear apart the node structure so we can manually execute Type.__call__ with the proper arguments.
+            #it would be preferable to just transform the node structure into the node structure for `name = Type(name, parent, [a,b,...])`
+            #effectively making this whole statement into just syntactic sugar 
+            #but it's a bit tricky to transform a node into a call expression, due to the twisty definition of the `Primary` node.
+            name = objectFactory.make(node.children[0].token.value)
+            if len(node.children) == 2:
+                parent_name = "Object"
+            else:
+                parent_name = node.children[1].token.value
+            parent_name = objectFactory.make(parent_name)
+            declaration_list = node.children[-1]
+            pairs = []
+            for declaration_statement in declaration_list.children:
+                func = ast.Node("FunctionDeclaration", node.children[1:])
+                func = evaluate(func, scopes)
+                id = objectFactory.make(node.children[0].token.value)
+                pairs.append(id)
+                pairs.append(func)
+            pairs = objectFactory.make(list(pairs))
+            evaluate_function(builtins["Type"]["private"]["instance_methods"]["__call__"], scopes, [builtins["Type"], name, parent_name, pairs])
+            return statement_default_return_value
         elif node.klass == "ExpressionStatement":
             evaluate(node.children[0], scopes)
             return statement_default_return_value

@@ -64,6 +64,6 @@ gt -> >
 lt -> <
 
 #proposed syntax for potential class feature
-#Statement -> ClassDeclarationStatement
-#ClassDeclarationStatement -> class identifier { FunctionDeclarationStatementList } | class identifier ( identifier ) { FunctionDeclarationStatementList }
-#FunctionDeclarationStatementList -> FunctionDeclarationStatement | FunctionDeclarationStatement FunctionDeclarationStatementList
+Statement -> ClassDeclarationStatement
+ClassDeclarationStatement -> class identifier { FunctionDeclarationStatementList } | class identifier ( identifier ) { FunctionDeclarationStatementList }
+FunctionDeclarationStatementList -> FunctionDeclarationStatement | FunctionDeclarationStatement FunctionDeclarationStatementList

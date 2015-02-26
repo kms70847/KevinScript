@@ -9,7 +9,7 @@ sys.path.insert(0, parser_dir)
 import ast
 from eval_ast import evaluate
 
-reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList"]
+reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList", "FunctionDeclarationStatementList"]
 
 compile = ast.get_compiler(
     os.path.join(cur_dir, "tokens.txt"), 
@@ -36,7 +36,7 @@ def check_output(*args, **kargs):
             for channel in self.channels:
                 channel.write(data)
 
-    verbose = kargs.pop("verbose", False)
+    verbose = kargs.pop("verbose", True)
     string_io = StringIO.StringIO()
     old_stdout = sys.stdout
 
