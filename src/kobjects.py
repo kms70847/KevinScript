@@ -32,12 +32,13 @@ class ObjectFactory:
 
 
         #used to create user-defined types
-        def create_type(obj, name, parent, *name_function_pairs):
+        def create_type(obj, name, parent, interleaved_name_function_pairs):
             obj["public"]["parent"] = parent
             obj["private"]["name"] = name["private"]["value"]
             obj["private"]["instance_methods"] = {}
-            for pair in name_function_pairs:
-                func_name, func = pair["private"]["items"]
+            seq = interleaved_name_function_pairs["private"]["items"]
+            for i in range(0, len(seq), 2):
+                func_name, func = seq[i], seq[i+1]
                 obj["private"]["instance_methods"][func_name["private"]["value"]] = func
         def call_type_instance(type_instance, *args):
             ret = self.make_Object(type_instance["private"]["name"])
