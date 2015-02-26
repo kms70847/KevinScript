@@ -40,6 +40,60 @@ def evaluate_function(func, scopes=None, argument_values=None):
 def get_type_name(obj):
     return obj["public"]["type"]["private"]["name"]
 
+
+#helper function to transform AssignmentDeclarationStatements during `evaluate`
+"""
+creates an AssignmentStatement node of the form `className = Type('classname', parent, ['firstname', function(){...}, 'secondname', function(){...}]
+arguments:
+    class_name - the name of the class. Must be a Token.
+    parent_name - the name of the class' parent. Must be a Token.
+    function_names - a list of the class' methods' names. Must be Tokens.
+    function_nodes - a list of the class' methods. Must be Nodes of the FunctionDeclaration klass.
+"""
+def make_type_call_node(class_name, parent_name, function_names, function_nodes):
+    Node = ast.Node
+    Leaf = ast.Leaf
+    def make_string_literal_node(token):
+        import lex
+        token = token.copy()
+        token.klass = lex.LiteralTokenRule("string_literal")
+        return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Atom", [Node("Literal", [Leaf(token)])])])])])])])
+
+    def make_identifier_node(token):
+        return Node("Primary", [Node("Atom", [Leaf(token)])])
+
+    def make_identifier_expression_node(token):
+        primary = make_identifier_node(token)
+        return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [primary])])])])
+
+    def make_list_literal_node(value_nodes):
+        return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Atom", [Node("Enclosure", [Node("ListDisplay", [Node("ExpressionList", value_nodes)])])])])])])])])
+
+    def make_call_expression_node(obj, argument_nodes):
+        expression_list = Node("ExpressionList", argument_nodes)
+        return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Call", [obj, expression_list])])])])])])
+
+
+    #I don't want to import `lex` just to create one token,
+    #so we'll just copy an existing token and modify it for `Type`.
+    type_class_identifier = class_name.copy()
+    type_class_identifier.value = "Type"
+    list_literal_contents = []
+    for function_name, function_node in zip(function_names, function_nodes):
+        list_literal_contents.append(make_string_literal_node(function_name))
+        list_literal_contents.append(Node("Expression", [function_node]))
+    return Node("Statement", [Node("AssignmentStatement", [
+        Leaf(class_name),
+        make_call_expression_node(
+            make_identifier_node(type_class_identifier),
+            [
+                make_string_literal_node(class_name),
+                make_identifier_expression_node(parent_name),
+                make_list_literal_node(list_literal_contents)
+            ]
+        )
+    ])])
+
 def evaluate(node, scopes=None):
     if scopes == None:
         scopes = [builtins]
@@ -158,28 +212,18 @@ def evaluate(node, scopes=None):
             assignment = ast.Node("AssignmentStatement", [id, func])
             return evaluate(assignment, scopes)
         elif node.klass == "ClassDeclarationStatement":
-            #this is a pretty ugly implementation.
-            #we tear apart the node structure so we can manually execute Type.__call__ with the proper arguments.
-            #it would be preferable to just transform the node structure into the node structure for `name = Type(name, parent, [a,b,...])`
-            #effectively making this whole statement into just syntactic sugar 
-            #but it's a bit tricky to transform a node into a call expression, due to the twisty definition of the `Primary` node.
-            name = objectFactory.make(node.children[0].token.value)
-            if len(node.children) == 2:
-                parent_name = "Object"
-            else:
-                parent_name = node.children[1].token.value
-            parent_name = objectFactory.make(parent_name)
+            class_name = node.children[0].token
+            if len(node.children) == 2: raise Exception("parent-less class declaration not implemented yet")
+            parent_name = node.children[1].token
+            function_names, function_nodes = [], []
             declaration_list = node.children[-1]
-            pairs = []
             for declaration_statement in declaration_list.children:
-                func = ast.Node("FunctionDeclaration", node.children[1:])
-                func = evaluate(func, scopes)
-                id = objectFactory.make(node.children[0].token.value)
-                pairs.append(id)
-                pairs.append(func)
-            pairs = objectFactory.make(list(pairs))
-            evaluate_function(builtins["Type"]["private"]["instance_methods"]["__call__"], scopes, [builtins["Type"], name, parent_name, pairs])
-            return statement_default_return_value
+                name = declaration_statement.children[0].token
+                func = ast.Node("FunctionDeclaration", declaration_statement.children[1:])
+                function_names.append(name)
+                function_nodes.append(func)
+            type_call_node = make_type_call_node(class_name, parent_name, function_names, function_nodes)
+            return evaluate(type_call_node, scopes)
         elif node.klass == "ExpressionStatement":
             evaluate(node.children[0], scopes)
             return statement_default_return_value
@@ -202,7 +246,9 @@ def evaluate(node, scopes=None):
         elif node.klass == "AttributeRef":
             obj = evaluate(node.children[0], scopes)
             attribute_name = node.children[1].token.value
-            return get_attribute(obj, attribute_name)
+            attr = get_attribute(obj, attribute_name)
+            assert attr, "{} object has no attribute '{}'".format(get_type_name(obj), attribute_name)
+            return attr
         elif node.klass == "Call":
             callable = evaluate(node.children[0], scopes)
             if len(node.children) == 1:
