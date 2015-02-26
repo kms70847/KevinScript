@@ -57,6 +57,7 @@ def make_type_call_node(class_name, parent_name, function_names, function_nodes)
         import lex
         token = token.copy()
         token.klass = lex.LiteralTokenRule("string_literal")
+        token.value = '"' + token.value + '"'
         return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Atom", [Node("Literal", [Leaf(token)])])])])])])])
 
     def make_identifier_node(token):
