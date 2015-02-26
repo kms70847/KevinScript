@@ -117,7 +117,7 @@ expect_output("""
 
 #class statement
 expect_output("""
-    class Barney{
+    class Barney(Object){
         function __init__(self){
             self.fronb = 23;
         }
@@ -128,7 +128,7 @@ expect_output("""
 
 #class statement with multiple methods
 expect_output("""
-    class Barney{
+    class Barney(Object){
         function __init__(self){
             self.frob = 2;
         }
