@@ -1,3 +1,4 @@
+import lex
 import ast
 from kobjects import ObjectFactory
 
@@ -54,7 +55,6 @@ def make_type_call_node(class_name, parent_name, function_names, function_nodes)
     Node = ast.Node
     Leaf = ast.Leaf
     def make_string_literal_node(token):
-        import lex
         token = token.copy()
         token.klass = lex.LiteralTokenRule("string_literal")
         token.value = '"' + token.value + '"'
@@ -75,10 +75,7 @@ def make_type_call_node(class_name, parent_name, function_names, function_nodes)
         return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Call", [obj, expression_list])])])])])])
 
 
-    #I don't want to import `lex` just to create one token,
-    #so we'll just copy an existing token and modify it for `Type`.
-    type_class_identifier = class_name.copy()
-    type_class_identifier.value = "Type"
+    type_class_identifier = lex.Token(lex.LiteralTokenRule("identifier"), "Type")
     list_literal_contents = []
     for function_name, function_node in zip(function_names, function_nodes):
         list_literal_contents.append(make_string_literal_node(function_name))
