@@ -116,7 +116,7 @@ expect_output("""
 """, '4')
 
 #class statement
-expect_runs("""class Barney(Object){}}""")
+expect_runs("""class Barney(Object){}""")
 
 #class statement with implicit parent
 expect_runs("""class Barney{}""")
