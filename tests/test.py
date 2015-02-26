@@ -116,6 +116,12 @@ expect_output("""
 """, '4')
 
 #class statement
+expect_runs("""class Barney(Object){}}""")
+
+#class statement with implicit parent
+expect_runs("""class Barney{}""")
+
+#attribute access from `self`
 expect_output("""
     class Barney(Object){
         function __init__(self){
