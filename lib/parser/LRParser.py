@@ -4,13 +4,9 @@
 from primitives import *
 from parseRules import *
 from lex import LiteralTokenRule, Token
+from parserExceptions import NoActionFoundError
 
 end_of_input_token = Token(LiteralTokenRule("$"), "$")
-
-class NoActionFoundError(Exception):
-    def __init__(self, token):
-        Exception.__init__(self, "Couldn't parse string - no action found for {}".format(token))
-        self.token = token
 
 # rules is a list of Rule objects.
 # actions is a dict whose key is a tuple of state and input symbol (int and string), and whose value is an Action object.
