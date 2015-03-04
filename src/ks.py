@@ -60,12 +60,33 @@ def check_output(*args, **kargs):
     return string_io.getvalue().rstrip()
     
 
+def repl():
+    def isEofException(ex):
+        return isinstance(ex, parserExceptions.NoActionFoundError) and ex.token.klass.name == "$"
+    data = ""
+    print ">>>",
+    while True:
+        try:
+            line = raw_input("")
+        except (EOFError, KeyboardInterrupt):
+            return
+        data += line
+        try:
+            execute(data, strict=True)
+        except Exception as ex:
+            if isEofException(ex):
+                print "...",
+                continue
+            else:
+                print ex
+        data = ""
+        print ">>>",
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
-        print("please supply a file name.")
+        repl()
         sys.exit(0)
-
 
     with open(sys.argv[1]) as file:
         program_text = file.read()
