@@ -7,6 +7,7 @@ top_dir = os.path.dirname(cur_dir)
 parser_dir = os.path.join(top_dir, "lib", "parser")
 sys.path.insert(0, parser_dir)
 import ast
+import parserExceptions
 from eval_ast import evaluate
 
 reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList", "FunctionDeclarationStatementList"]
@@ -20,7 +21,7 @@ compile = ast.get_compiler(
 def execute(program_text, strict=False):
     try:
         tree = compile(program_text)
-    except Exception as ex:
+    except parserExceptions.NoActionFoundError as ex:
         if ex.token.klass.name == "$" and not strict:
             #got end of file unexpectedly.
             #the user may have forgotten the terminating semicolon.
