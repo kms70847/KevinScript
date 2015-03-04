@@ -72,7 +72,8 @@ def repl():
             return
         data += line
         try:
-            execute(data, strict=True)
+            #if user entered an empty line, he's done with his statement even if he didn't end with a semicolon.
+            execute(data, strict=bool(line))
         except Exception as ex:
             if isEofException(ex):
                 print "...",
