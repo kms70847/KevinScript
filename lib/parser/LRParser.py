@@ -7,6 +7,10 @@ from lex import LiteralTokenRule, Token
 
 end_of_input_token = Token(LiteralTokenRule("$"), "$")
 
+class NoActionFoundError(Exception):
+    def __init__(self, token):
+        Exception.__init__(self, "Couldn't parse string - no action found for {}".format(token))
+        self.token = token
 
 # rules is a list of Rule objects.
 # actions is a dict whose key is a tuple of state and input symbol (int and string), and whose value is an Action object.
@@ -29,7 +33,7 @@ class LRParser:
 
             # no action: syntax error is reported
             if action_key not in self.actions:
-                raise Exception("couldn't parse string - no action found for {}".format(self.input[0]))
+                raise NoActionFoundError(self.input[0])
             action = self.actions[action_key]
 
             # an accept: string is accepted

@@ -18,9 +18,15 @@ compile = ast.get_compiler(
 )
 
 def execute(program_text, strict=False):
-    if not strict:
-        program_text += ";"
-    tree = compile(program_text)
+    try:
+        tree = compile(program_text)
+    except Exception as ex:
+        if ex.token.klass.name == "$" and not strict:
+            #got end of file unexpectedly.
+            #the user may have forgotten the terminating semicolon.
+            tree = compile(program_text + ";")
+        else:
+            raise
     evaluate(tree)
 
 def check_output(*args, **kargs):
