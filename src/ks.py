@@ -12,22 +12,26 @@ from eval_ast import evaluate
 
 reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList", "FunctionDeclarationStatementList"]
 
-compile = ast.get_compiler(
+base_compile = ast.get_compiler(
     os.path.join(cur_dir, "tokens.txt"), 
     os.path.join(cur_dir, "language.txt"), 
     reducible_nodes
 )
 
-def execute(program_text, strict=False):
+def compile(program_text, strict=False):
     try:
-        tree = compile(program_text)
+        tree = base_compile(program_text)
     except parserExceptions.NoActionFoundError as ex:
         if ex.token.klass.name == "$" and not strict:
             #got end of file unexpectedly.
             #the user may have forgotten the terminating semicolon.
-            tree = compile(program_text + ";")
+            tree = base_compile(program_text + ";")
         else:
             raise
+    return tree
+
+def execute(program_text, strict=False):
+    tree = compile(program_text, strict)
     evaluate(tree)
 
 def check_output(*args, **kargs):
