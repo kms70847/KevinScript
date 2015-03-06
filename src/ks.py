@@ -8,7 +8,7 @@ parser_dir = os.path.join(top_dir, "lib", "parser")
 sys.path.insert(0, parser_dir)
 import ast
 import parserExceptions
-from eval_ast import evaluate
+from eval_ast import evaluate, NodeConstructor
 
 reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList", "FunctionDeclarationStatementList"]
 
@@ -30,8 +30,17 @@ def compile(program_text, strict=False):
             raise
     return tree
 
-def execute(program_text, strict=False):
+def execute(program_text, strict=False, mode="exec"):
+    assert mode in ["exec", "single"], "did not recognize execution mode '{}'".format(mode)
     tree = compile(program_text, strict)
+    if mode == "single":
+        #primarily used by the REPL. if the final statement in the program is an expression that doesn't evaluate to None, print its result.
+        #print "entering pdb..."
+        #import pdb; pdb.set_trace()
+        assert tree.klass == "StatementList"
+        last_statement = tree.children[-1].children[0]
+        if last_statement.klass == "ExpressionStatement":
+            last_statement.children[0] = NodeConstructor.make_print_call(last_statement.children[0])
     evaluate(tree)
 
 def check_output(*args, **kargs):
@@ -77,7 +86,7 @@ def repl():
         data += line
         try:
             #if user entered an empty line, he's done with his statement even if he didn't end with a semicolon.
-            execute(data, strict=bool(line))
+            execute(data, strict=bool(line), mode="single")
         except Exception as ex:
             if isEofException(ex):
                 print "...",
