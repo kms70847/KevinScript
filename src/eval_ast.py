@@ -1,5 +1,6 @@
 import lex
 import ast
+from ast import Node, Leaf
 from kobjects import ObjectFactory
 
 def extract_identifiers(node):
@@ -38,57 +39,61 @@ def evaluate_function(func, scopes=None, argument_values=None):
         #external code func
         return func["private"]["body"](scopes, *argument_values)
 
-#helper function to transform AssignmentDeclarationStatements during `evaluate`
-"""
-creates an AssignmentStatement node of the form `className = Type('classname', parent, ['firstname', function(){...}, 'secondname', function(){...}]
-arguments:
-    class_name - the name of the class. Must be a Token.
-    parent_name - the name of the class' parent. Must be a Token or None.
-    function_names - a list of the class' methods' names. Must be Tokens.
-    function_nodes - a list of the class' methods. Must be Nodes of the FunctionDeclaration klass.
-"""
-def make_type_call_node(class_name, parent_name, function_names, function_nodes):
-    Node = ast.Node
-    Leaf = ast.Leaf
+#static class containing methods that are useful in transforming the AST.
+class NodeConstructor:
+    @staticmethod
     def make_string_literal_node(token):
         token = token.copy()
         token.klass = lex.LiteralTokenRule("string_literal")
         token.value = '"' + token.value + '"'
         return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Atom", [Node("Literal", [Leaf(token)])])])])])])])
 
+    @staticmethod
     def make_identifier_node(token):
         return Node("Primary", [Node("Atom", [Leaf(token)])])
 
+    @staticmethod
     def make_identifier_expression_node(token):
-        primary = make_identifier_node(token)
+        primary = NodeConstructor.make_identifier_node(token)
         return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [primary])])])])
 
+    @staticmethod
     def make_list_literal_node(value_nodes):
         return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Atom", [Node("Enclosure", [Node("ListDisplay", [Node("ExpressionList", value_nodes)])])])])])])])])
 
+    @staticmethod
     def make_call_expression_node(obj, argument_nodes):
         expression_list = Node("ExpressionList", argument_nodes)
-        return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Call", [obj, expression_list])])])])])])
+        return Node("Expression", [Node("CompExpression", [Node("AddExpression", [Node("MultExpression", [Node("Primary", [Node("Call", [obj, expression_list])])])])])])#helper function to transform AssignmentDeclarationStatements during `evaluate`
 
-
-    type_class_identifier = lex.Token(lex.LiteralTokenRule("identifier"), "Type")
-    if parent_name is None: 
-        parent_name = lex.Token(lex.LiteralTokenRule("identifier"), "Object")
-    list_literal_contents = []
-    for function_name, function_node in zip(function_names, function_nodes):
-        list_literal_contents.append(make_string_literal_node(function_name))
-        list_literal_contents.append(Node("Expression", [function_node]))
-    return Node("Statement", [Node("AssignmentStatement", [
-        Leaf(class_name),
-        make_call_expression_node(
-            make_identifier_node(type_class_identifier),
-            [
-                make_string_literal_node(class_name),
-                make_identifier_expression_node(parent_name),
-                make_list_literal_node(list_literal_contents)
-            ]
-        )
-    ])])
+    """
+    creates an AssignmentStatement node of the form `className = Type('classname', parent, ['firstname', function(){...}, 'secondname', function(){...}]
+    arguments:
+        class_name - the name of the class. Must be a Token.
+        parent_name - the name of the class' parent. Must be a Token or None.
+        function_names - a list of the class' methods' names. Must be Tokens.
+        function_nodes - a list of the class' methods. Must be Nodes of the FunctionDeclaration klass.
+    """
+    @staticmethod
+    def make_type_call_node(class_name, parent_name, function_names, function_nodes):
+        type_class_identifier = lex.Token(lex.LiteralTokenRule("identifier"), "Type")
+        if parent_name is None: 
+            parent_name = lex.Token(lex.LiteralTokenRule("identifier"), "Object")
+        list_literal_contents = []
+        for function_name, function_node in zip(function_names, function_nodes):
+            list_literal_contents.append(NodeConstructor.make_string_literal_node(function_name))
+            list_literal_contents.append(Node("Expression", [function_node]))
+        return Node("Statement", [Node("AssignmentStatement", [
+            Leaf(class_name),
+            NodeConstructor.make_call_expression_node(
+                NodeConstructor.make_identifier_node(type_class_identifier),
+                [
+                    NodeConstructor.make_string_literal_node(class_name),
+                    NodeConstructor.make_identifier_expression_node(parent_name),
+                    NodeConstructor.make_list_literal_node(list_literal_contents)
+                ]
+            )
+        ])])
 
 def evaluate(node, scopes=None):
     if scopes == None:
@@ -211,7 +216,7 @@ def evaluate(node, scopes=None):
                     func = ast.Node("FunctionDeclaration", declaration_statement.children[1:])
                     function_names.append(name)
                     function_nodes.append(func)
-            type_call_node = make_type_call_node(class_name, parent_name, function_names, function_nodes)
+            type_call_node = NodeConstructor.make_type_call_node(class_name, parent_name, function_names, function_nodes)
             return evaluate(type_call_node, scopes)
         elif node.klass == "ExpressionStatement":
             evaluate(node.children[0], scopes)
