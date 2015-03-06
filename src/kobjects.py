@@ -114,6 +114,7 @@ class ObjectFactory:
             result = self.eval_func(method, scopes, [])
             assert self.get_type_name(result) == "String", "expected repr to return String, got {}".format(self.get_type_name(result))
             print(result["private"]["value"])
+            return self.builtins["None"]
         self.builtins["print"] = self.make_Function(print_)
 
     #functions of the form make_*** are used by the host language to construct 
