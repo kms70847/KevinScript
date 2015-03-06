@@ -95,6 +95,16 @@ class NodeConstructor:
             )
         ])])
 
+    #turns an expression into a print function that has that expression as its argument
+    @staticmethod
+    def make_print_call(expression):
+        return NodeConstructor.make_call_expression_node(
+            NodeConstructor.make_identifier_node(lex.Token(lex.LiteralTokenRule("identifier"), "print")),
+            [
+                expression
+            ]
+        )
+
 def evaluate(node, scopes=None):
     if scopes == None:
         scopes = [builtins]
