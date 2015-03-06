@@ -27,23 +27,23 @@ def expect_output(code, output):
 expect_runs("")
 
 #printing literals and builtins
-expect_output('print "Hello, World!"', 'Hello, World!')
-expect_output('print 123', '123')
-expect_output('print True', 'True')
-expect_output('print False', 'False')
+expect_output('print("Hello, World!")', 'Hello, World!')
+expect_output('print(123)', '123')
+expect_output('print(True)', 'True')
+expect_output('print(False)', 'False')
 print "skipping tests for list output until support for native builtin methods is available"
 #expect_output('print [1, 2, 3]', '[1, 2, 3]')
 #expect_output('print [1, [2, [3]]]', '[1, [2, [3]]]')
-expect_output('print None', 'None')
-expect_output('print Object', "<type 'Object'>")
+expect_output('print(None)', 'None')
+expect_output('print(Object)', "<type 'Object'>")
 
 #assignment statements
 expect_runs("foo = 23")
 
 #if statements
 expect_runs('if (True){;}')
-expect_output('if (True){print "success";}', "success")
-expect_output('if (False){;} else{print "success";}', "success")
+expect_output('if (True){print("success");}', "success")
+expect_output('if (False){;} else{print("success");}', "success")
 
 #functions - declaration, `return`, evaluation
 expect_runs('function frob(){;}')
@@ -51,7 +51,7 @@ expect_output("""
     function frob(x){
         return x;
     }
-    print frob(23)
+    print(frob(23))
     """,
     "23"
 )
@@ -67,24 +67,24 @@ expect_runs('(True)')
 expect_runs('(((((True)))))')
 
 #arithmetic
-expect_output("print 1+1", "2")
-expect_output("print 42-23", "19")
-expect_output("print 23*2", "46")
-expect_output("print 42/2", "21")
-expect_output("print 23%2", "1")
-expect_output("print 0==0", "True")
-expect_output("print 23 < 42", "True")
-expect_output("print 42 > 23", "True")
+expect_output("print(1+1)", "2")
+expect_output("print(42-23)", "19")
+expect_output("print(23*2)", "46")
+expect_output("print(42/2)", "21")
+expect_output("print(23%2)", "1")
+expect_output("print(0==0)", "True")
+expect_output("print(23 < 42)", "True")
+expect_output("print(42 > 23)", "True")
 expect_runs("1 * 1 + 1 / 1 - 1 < 1")
 
 #builtin type instantiation
-expect_output("print Object()", "<Object instance>")
-expect_output("print Integer()", "0")
-expect_output("print String()", "")
+expect_output("print(Object())", "<Object instance>")
+expect_output("print(Integer())", "0")
+expect_output("print(String())", "")
 
 #attribute getting/setting
-expect_output("foo = Object(); foo.bar=23; print foo.bar", "23")
-expect_output("foo = Object(); foo.bar=function(){return 23;}; print foo.bar()", "23")
+expect_output("foo = Object(); foo.bar=23; print(foo.bar)", "23")
+expect_output("foo = Object(); foo.bar=function(){return 23;}; print(foo.bar())", "23")
 
 #while loops
 expect_runs("""
@@ -105,14 +105,14 @@ expect_runs("""
 expect_output("""
     Fred = Type("Fred", Object, ["__init__", function(self){self.frob=23;}]);
     x = Fred();
-    print x.frob;
+    print(x.frob);
 """, '23')
 
 #type call with multiple methods
 expect_output("""
     Fred = Type("Fred", Object, ["__init__", function(self){self.frob=2;}, "durf", function(self){return 2;}]);
     x = Fred();
-    print x.frob + x.durf();
+    print(x.frob + x.durf());
 """, '4')
 
 #class statement
@@ -129,7 +129,7 @@ expect_output("""
         }
     };
     x = Barney();
-    print x.fronb;
+    print(x.fronb);
 """, '23')
 
 #class statement with multiple methods
@@ -143,7 +143,7 @@ expect_output("""
         }
     };
     x = Barney();
-    print x.frob + x.durf();
+    print(x.frob + x.durf());
 """, '4')
 
 

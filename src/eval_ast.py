@@ -38,10 +38,6 @@ def evaluate_function(func, scopes=None, argument_values=None):
         #external code func
         return func["private"]["body"](scopes, *argument_values)
 
-def get_type_name(obj):
-    return obj["public"]["type"]["private"]["name"]
-
-
 #helper function to transform AssignmentDeclarationStatements during `evaluate`
 """
 creates an AssignmentStatement node of the form `className = Type('classname', parent, ['firstname', function(){...}, 'secondname', function(){...}]
@@ -114,11 +110,11 @@ def evaluate(node, scopes=None):
 
     if isinstance(node, ast.Leaf):
         if node.token.klass.name == "number":
-            return objectFactory.make(int(node.token.value))
+            return object_factory.make(int(node.token.value))
         elif node.token.klass.name == "identifier":
             return get_var(node.token.value)
         elif node.token.klass.name == "string_literal":
-            return objectFactory.make(node.token.value[1:-1])
+            return object_factory.make(node.token.value[1:-1])
         else:
             raise Exception("evaluate not implemented yet for leaf {}".format(node.token))
     else:
@@ -152,21 +148,13 @@ def evaluate(node, scopes=None):
                 attribute_name = lhs.children[1].token.value
                 node["public"][attribute_name] = evaluate(expression_node, scopes)
             return statement_default_return_value
-        elif node.klass == "PrintStatement":
-            obj = evaluate(node.children[0], scopes)
-            method = get_attribute(obj, "__repr__")
-            assert method, "{} object has no method __repr__".format(get_type_name(obj))
-            result = evaluate_function(method, scopes, [])
-            assert get_type_name(result) == "String", "expected repr to return String, got {}".format(get_type_name(result))
-            print(result["private"]["value"])
-            return statement_default_return_value
         elif node.klass == "ReturnStatement":
             value = evaluate(node.children[0], scopes)
             return {"returning": True, "value": value}
         elif node.klass == "WhileStatement":
             while True:
                 cond = evaluate(node.children[0], scopes)
-                if not get_type_name(cond) == "Boolean":
+                if not object_factory.get_type_name(cond) == "Boolean":
                     cond = cond.bool()
                 if cond is not builtins["True"]:
                     break
@@ -180,11 +168,11 @@ def evaluate(node, scopes=None):
             seq = evaluate(node.children[1], scopes)
             size_func = get_attribute(seq, "size")
             at_func = get_attribute(seq, "at")
-            assert size_func, "Can't iterate over type {} with no `size` function".format(get_type_name(seq))
-            assert at_func, "Can't iterate over type {} with no `at` function".format(get_type_name(seq))
+            assert size_func, "Can't iterate over type {} with no `size` function".format(object_factory.get_type_name(seq))
+            assert at_func, "Can't iterate over type {} with no `at` function".format(object_factory.get_type_name(seq))
             size = evaluate_function(size_func, scopes, [])["private"]["value"]
             for idx in range(size):
-                item = evaluate_function(at_func, scopes, [objectFactory.make(idx)])
+                item = evaluate_function(at_func, scopes, [object_factory.make(idx)])
                 scopes[-1][identifier] = item
                 result = evaluate(node.children[2], scopes)
                 if result["returning"]:
@@ -192,9 +180,9 @@ def evaluate(node, scopes=None):
             return statement_default_return_value
         elif node.klass == "IfStatement":
             cond = evaluate(node.children[0], scopes)
-            if not get_type_name(cond) == "Boolean":
+            if not object_factory.get_type_name(cond) == "Boolean":
                 cond = cond.bool()
-            assert get_type_name(cond) == "Boolean", "expected Boolean, got {}".format(get_type_name(cond))
+            assert object_factory.get_type_name(cond) == "Boolean", "expected Boolean, got {}".format(object_factory.get_type_name(cond))
             if cond is builtins["True"]:
                 result = evaluate(node.children[1], scopes)
                 if result["returning"]:
@@ -238,7 +226,7 @@ def evaluate(node, scopes=None):
             else:  # no arguments
                 arguments = []
                 body = node.children[0]
-            return objectFactory.make_Function(body, arguments, scopes)
+            return object_factory.make_Function(body, arguments, scopes)
         elif node.klass == "FunctionDeclarationArgumentList":
             return evaluate(node.children[0], scopes)
 
@@ -248,7 +236,7 @@ def evaluate(node, scopes=None):
             obj = evaluate(node.children[0], scopes)
             attribute_name = node.children[1].token.value
             attr = get_attribute(obj, attribute_name)
-            assert attr, "{} object has no attribute '{}'".format(get_type_name(obj), attribute_name)
+            assert attr, "{} object has no attribute '{}'".format(object_factory.get_type_name(obj), attribute_name)
             return attr
         elif node.klass == "Call":
             callable = evaluate(node.children[0], scopes)
@@ -259,7 +247,7 @@ def evaluate(node, scopes=None):
             is_func = lambda obj: all(attr in obj["private"] for attr in ("body", "arguments", "closure"))
             while has_attribute(callable, "__call__") and not is_func(callable):
                 callable = get_attribute(callable, "__call__")
-            assert is_func(callable), "expected callable, got {} at {}".format(get_type_name(callable), line(node))
+            assert is_func(callable), "expected callable, got {} at {}".format(object_factory.get_type_name(callable), line(node))
             try:
                 return evaluate_function(callable, scopes, arguments)
             except:
@@ -278,18 +266,18 @@ def evaluate(node, scopes=None):
                 right = evaluate(node.children[2], scopes)
                 func_name = "__" + operator + "__"
                 method = get_attribute(left, func_name)
-                assert method, "object {} has no method {}".format(get_type_name(left), func_name)
+                assert method, "object {} has no method {}".format(object_factory.get_type_name(left), func_name)
 
                 return evaluate_function(method, scopes, [right])
         elif node.klass == "ListDisplay":
             items = []
             if node.children:
                 items = evaluate(node.children[0], scopes)
-            return objectFactory.make(items)
+            return object_factory.make(items)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))
 
-objectFactory = ObjectFactory(evaluate_function)
-builtins = objectFactory.builtins
-get_attribute = objectFactory.get_attribute
-has_attribute = objectFactory.has_attribute
+object_factory = ObjectFactory(evaluate_function)
+builtins = object_factory.builtins
+get_attribute = object_factory.get_attribute
+has_attribute = object_factory.has_attribute

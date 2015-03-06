@@ -105,6 +105,17 @@ class ObjectFactory:
             for method_name, host_func in methods.iteritems():
                 register_method(type, method_name, host_func)
 
+        self.init_builtin_funcs()
+
+    def init_builtin_funcs(self):
+        def print_(scopes, obj):
+            method = self.get_attribute(obj, "__repr__")
+            assert method, "{} object has no method __repr__".format(get_type_name(obj))
+            result = self.eval_func(method, scopes, [])
+            assert self.get_type_name(result) == "String", "expected repr to return String, got {}".format(self.get_type_name(result))
+            print(result["private"]["value"])
+        self.builtins["print"] = self.make_Function(print_)
+
     #functions of the form make_*** are used by the host language to construct 
     #object instances without having to invoke their type's `__call__` method.
 
@@ -202,3 +213,7 @@ class ObjectFactory:
             
     def has_attribute(self, obj, name):
         return self.get_attribute(obj, name) is not None
+
+    @staticmethod
+    def get_type_name(obj):
+        return obj["public"]["type"]["private"]["name"]
