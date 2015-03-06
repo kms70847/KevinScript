@@ -40,7 +40,7 @@ def execute(program_text, strict=False, mode="exec"):
         assert tree.klass == "StatementList"
         last_statement = tree.children[-1].children[0]
         if last_statement.klass == "ExpressionStatement":
-            last_statement.children[0] = NodeConstructor.make_identifier_call("print", [last_statement.children[0]])
+            last_statement.children[0] = NodeConstructor.make_identifier_call("print_single", [last_statement.children[0]])
     evaluate(tree)
 
 def check_output(*args, **kargs):

@@ -115,7 +115,14 @@ class ObjectFactory:
             assert self.get_type_name(result) == "String", "expected repr to return String, got {}".format(self.get_type_name(result))
             print(result["private"]["value"])
             return self.builtins["None"]
+        #primarily used by the REPL. Prints everything but `None`.
+        def print_single(scopes, obj):
+            if obj == self.builtins["None"]:
+                return self.builtins["None"]
+            else:
+                return print_(scopes, obj)
         self.builtins["print"] = self.make_Function(print_)
+        self.builtins["print_single"] = self.make_Function(print_single)
 
     #functions of the form make_*** are used by the host language to construct 
     #object instances without having to invoke their type's `__call__` method.
