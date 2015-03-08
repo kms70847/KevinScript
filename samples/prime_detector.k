@@ -8,11 +8,11 @@ function is_prime(x){
     return True;
 }
 
-print "Prime numbers below 100:";
+print("Prime numbers below 100:");
 i = 2;
 while(i<100){
     if (is_prime(i)){
-        print i;
+        print(i);
     }
     i = i + 1;
 }
