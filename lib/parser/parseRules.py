@@ -44,6 +44,6 @@ def parse_rules(rule_text):
             if token in non_terminal_symbols:
                 RHS.append(NonTerminal(token))
             else:
-                RHS.append(Terminal(token))
+                RHS.append(Terminal(token.strip("'")))
         ret.append(Rule(LHS, RHS))
     return ret
