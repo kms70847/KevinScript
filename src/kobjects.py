@@ -73,6 +73,8 @@ class ObjectFactory:
 
             },
             "Boolean":{
+                "__and__": lambda obj, other: obj is self.builtins["True"] and other is self.builtins["True"],
+                "__or__": lambda obj, other: obj is self.builtins["True"] or other is self.builtins["True"],
                 "__repr__": lambda obj: "True" if obj is self.builtins["True"] else "False"
             },
             "Type":{

@@ -34,11 +34,12 @@ DictDisplay -> { } | { KeyValueList }
 KeyValueList -> KeyValuePair | KeyValuePair , KeyValueList
 KeyValuePair -> Expression : Expression
 
-#operator precedence: [* / %], [+ -], [!= == > <]
+#operator precedence: [* / %], [+ -], [!= == > <], [and or]
 MultExpression -> Primary | MultExpression mult_operator Primary
 AddExpression -> MultExpression | AddExpression add_operator MultExpression
 CompExpression -> AddExpression | CompExpression comp_operator AddExpression
-Expression -> CompExpression | FunctionDeclaration
+BinOpExpression -> CompExpression | BinOpExpression bin_operator CompExpression
+Expression -> BinOpExpression | FunctionDeclaration
 
 #function declaration style that may be used within an expression.
 #not to be confused with FunctionDeclarationStatement, which cannot.
@@ -51,6 +52,7 @@ ExpressionList -> Expression | Expression , ExpressionList
 mult_operator -> mul | div | mod
 add_operator -> add | sub
 comp_operator -> ne | eq | gt | lt
+bin_operator -> and | or
 mul -> *
 div -> /
 mod -> %
@@ -60,6 +62,8 @@ ne -> !=
 eq -> ==
 gt -> >
 lt -> <
+and -> 'and'
+or -> 'or'
 
 #proposed syntax for potential class feature
 Statement -> ClassDeclarationStatement

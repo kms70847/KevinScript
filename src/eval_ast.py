@@ -270,7 +270,7 @@ def evaluate(node, scopes=None):
             return [evaluate(child, scopes) for child in node.children]
         elif node.klass == "IdentifierList":
             return [child.token.value for child in node.children]
-        elif node.klass in "AddExpression CompExpression MultExpression".split():
+        elif node.klass in "AddExpression CompExpression MultExpression BinOpExpression".split():
             if len(node.children) == 1:
                 return evaluate(node.children[0], scopes)
             else:
