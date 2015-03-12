@@ -67,6 +67,8 @@ expect_runs('(True)')
 expect_runs('(((((True)))))')
 
 #arithmetic
+expect_output("print(-1)", "-1")
+expect_output("print(+1)", "1")
 expect_output("print(1+1)", "2")
 expect_output("print(42-23)", "19")
 expect_output("print(23*2)", "46")

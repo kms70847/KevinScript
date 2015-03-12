@@ -69,7 +69,10 @@ class ObjectFactory:
                 "__sub__" : lambda obj, other: obj["private"]["value"] - other["private"]["value"],
                 "__mul__" : lambda obj, other: obj["private"]["value"] * other["private"]["value"],
                 "__div__" : lambda obj, other: obj["private"]["value"] / other["private"]["value"],
-                "__mod__" : lambda obj, other: obj["private"]["value"] % other["private"]["value"]
+                "__mod__" : lambda obj, other: obj["private"]["value"] % other["private"]["value"],
+                "__neg__" : lambda obj: -obj["private"]["value"],
+                "__pos__" : lambda obj: +obj["private"]["value"],
+
 
             },
             "Boolean":{

@@ -35,7 +35,8 @@ KeyValueList -> KeyValuePair | KeyValuePair , KeyValueList
 KeyValuePair -> Expression : Expression
 
 #operator precedence: [* / %], [+ -], [!= == > <], [and or]
-MultExpression -> Primary | MultExpression mult_operator Primary
+UnaryOpExpression -> Primary | unary_operator Primary
+MultExpression -> UnaryOpExpression | MultExpression mult_operator UnaryOpExpression
 AddExpression -> MultExpression | AddExpression add_operator MultExpression
 CompExpression -> AddExpression | CompExpression comp_operator AddExpression
 BinOpExpression -> CompExpression | BinOpExpression bin_operator CompExpression
@@ -49,10 +50,13 @@ FunctionDeclarationArgumentList -> IdentifierList
 IdentifierList -> identifier | identifier , IdentifierList
 ExpressionList -> Expression | Expression , ExpressionList
 
+unary_operator -> pos | neg
 mult_operator -> mul | div | mod
 add_operator -> add | sub
 comp_operator -> ne | eq | gt | lt
 bin_operator -> and | or
+pos -> +
+neg -> -
 mul -> *
 div -> /
 mod -> %

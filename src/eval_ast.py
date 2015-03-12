@@ -270,6 +270,18 @@ def evaluate(node, scopes=None):
             return [evaluate(child, scopes) for child in node.children]
         elif node.klass == "IdentifierList":
             return [child.token.value for child in node.children]
+        elif node.klass == "UnaryOpExpression":
+            #behavior is effectively identical to Add/Comp/Mult/BinOpExpression, except with only one argument
+            if len(node.children) == 1:
+                return evaluate(node.children[0], scopes)
+            else:
+                operator = node.children[0].children[0].klass
+                value = evaluate(node.children[1], scopes)
+                func_name = "__" + operator + "__"
+                method = get_attribute(value, func_name)
+                assert method, "object {} has no method {}".format(object_factory.get_type_name(value), func_name)
+
+                return evaluate_function(method, scopes, [])
         elif node.klass in "AddExpression CompExpression MultExpression BinOpExpression".split():
             if len(node.children) == 1:
                 return evaluate(node.children[0], scopes)
