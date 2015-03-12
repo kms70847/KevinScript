@@ -362,7 +362,7 @@ An atom expression is one of three things:
 No, this is a real programming language that has real code. You can download it and it really runs.
 ## What good is this language for?
 Currently nothing. For any programming project you can think of, there is probably a language that would execute it faster and more concisely than this one.
-## Have you considered using [insert grammar-reading/token-lexing/code-generating/compiler-writing library here]?
+## Have you considered using [insert grammar-reading / token-lexing / code-generating / compiler-writing library here]?
 KevinScript subscribes to a policy of radical compatibility. It ought to be able to run on any machine that has any Python distribution of 2.7 or higher. We don't want the user to have to download anything else. And anyway, implementing it the hard way builds character.
 ## Why are you doing this?
 Working on this project primarily serves as a learning experience about the decisions and pitfalls of language design. Why does Python have two kinds of classes? Why does `this` in Javascript sometimes point to the Window object, and sometimes to the object the current method is called on? Trying to do these kinds of things your own way can give valuable insight into the thought process of the original devs, and convey a level of understanding greater than just from reading source code or blog posts.
@@ -372,7 +372,7 @@ JKevinScript - A KS interpreter written in Javascript. Will run in the browser.
 KSKevinScript - A KS interpreter written in KevinScript.  
 Compiled KevinScript - compiles KS to C, which can then be compiled into an executable.  
 ## How can I contribute?
-Please submit bug reports and feature requests on the Github Issues page. QA and Design eagerly await your feedback!
+Please submit bug reports and feature requests on the Github Issues page. QA and Design eagerly await your feedback!  
 We are not actively seeking code contributions at this time.
 
 #Credits
