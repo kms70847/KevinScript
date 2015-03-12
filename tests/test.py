@@ -77,8 +77,8 @@ expect_output("print(23%2)", "1")
 expect_output("print(0==0)", "True")
 expect_output("print(23 < 42)", "True")
 expect_output("print(42 > 23)", "True")
-expect_output("True and False", "False")
-expect_output("True or False", "True")
+expect_output("print(True and False)", "False")
+expect_output("print(True or False)", "True")
 expect_runs("1 * 1 + 1 / 1 - 1 < 1")
 
 #builtin type instantiation
