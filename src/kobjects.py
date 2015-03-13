@@ -51,10 +51,6 @@ class ObjectFactory:
 
         #append `~` to the name of your method if you don't want its return value to be run through `self.make`
         instance_methods = {
-            "Object":{
-                "__repr__": lambda obj: "<Object instance>",
-                "__init__": lambda obj: None
-            },
             "String":{
                 "__init__": lambda obj: init_obj(obj, ""),
                 "__repr__": lambda obj: obj["private"]["value"],
@@ -76,18 +72,13 @@ class ObjectFactory:
 
 
             },
-            "Boolean":{
-                "__and__": lambda obj, other: obj is self.builtins["True"] and other is self.builtins["True"],
-                "__or__": lambda obj, other: obj is self.builtins["True"] or other is self.builtins["True"],
-                "__repr__": lambda obj: "True" if obj is self.builtins["True"] else "False"
-            },
             "Type":{
                 "__repr__": lambda obj: "<type '{}'>".format(obj["private"]["name"]),
                 "__call__~": call_type_instance,
                 "__init__": create_type
             },
             "Nonetype":{
-                "__repr__": lambda obj: "None"
+                #"__repr__": lambda obj: "None"
             },
             "List":{
                 "size": lambda obj: len(obj["private"]["items"]),
@@ -118,7 +109,7 @@ class ObjectFactory:
         def print_(scopes, obj):
             #import pdb; pdb.set_trace()
             method = self.get_attribute(obj, "__repr__")
-            assert method, "{} object has no method __repr__".format(get_type_name(obj))
+            assert method, "{} object has no method __repr__".format(self.get_type_name(obj))
             result = self.eval_func(method, scopes, [])
             assert self.get_type_name(result) == "String", "expected repr to return String, got {}".format(self.get_type_name(result))
             print(result["private"]["value"])
@@ -133,7 +124,7 @@ class ObjectFactory:
         def override_method(scopes, type, method_name, func):
             if "instance_methods" not in type["private"]:
                 #maybe we should raise an exception here?
-                return
+                raise Exception("`type` parameter is not a type")
             method_name = method_name["private"]["value"]
             type["private"]["instance_methods"][method_name] = func
             return self.builtins["None"]
