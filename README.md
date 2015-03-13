@@ -84,6 +84,8 @@ The List is the primary compound data type. It can be used to collect objects to
     >>> seq.size();
     6
     >>> seq.append(100);
+    >>> seq;
+    [4, 8, 15, 16, 23, 42, 100]
     >>> seq.size();
     7
     >>> for(item in seq){print(item);}
@@ -343,12 +345,8 @@ Used to create new lists by applying some expression to each element of an exist
 
     >>> x = [1,2,3];
     >>> y = [a*2 for a in x];
-    >>> y.at(0);
-    2
-    >>> y.at(1);
-    4
-    >>> y.at(2);
-    6
+    >>> y;
+    [2, 4, 6]
 
 ## Calling Objects
 An expression can be called by adding a pair of parentheses, which may contain zero to infinity arguments. For example, `print` is a function that can be called with one argument.
