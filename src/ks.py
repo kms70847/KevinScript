@@ -96,6 +96,9 @@ def repl():
         data = ""
         print ">>>",
 
+with open(os.path.join(cur_dir, "native_builtin_initialization.k")) as file:
+    execute(file.read())
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
