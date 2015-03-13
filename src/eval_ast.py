@@ -299,6 +299,15 @@ def evaluate(node, scopes=None):
             if node.children:
                 items = evaluate(node.children[0], scopes)
             return object_factory.make(items)
+        elif node.klass == "ListComp":
+            expression = node.children[0]
+            name = node.children[1].token.value
+            iterable = evaluate(node.children[2], scopes)["private"]["items"]
+            result = []
+            for item in iterable:
+                temp_scope = {name: item}
+                result.append(evaluate(expression, scopes + [temp_scope]))
+            return object_factory.make(result)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))
 

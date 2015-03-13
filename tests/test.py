@@ -150,6 +150,8 @@ expect_output("""
     print(x.frob + x.durf());
 """, '4')
 
+#list comprehension
+expect_runs("[x*2 for x in [1,2,3,4]]")
 
 #tests we'd like to pass for future versions
 #argument unpacking

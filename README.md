@@ -338,6 +338,18 @@ Similar to the function declaration statement, except it can be used anywhere an
 
 Function expressions are anonymous. There is no identifier between "function" and the parameter list.
 
+## List Comprehension
+Used to create new lists by applying some expression to each element of an existing list.
+
+    >>> x = [1,2,3];
+    >>> y = [a*2 for a in x];
+    >>> y.at(0);
+    2
+    >>> y.at(1);
+    4
+    >>> y.at(2);
+    6
+
 ## Calling Objects
 An expression can be called by adding a pair of parentheses, which may contain zero to infinity arguments. For example, `print` is a function that can be called with one argument.
     >>> print(23);

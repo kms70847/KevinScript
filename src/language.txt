@@ -40,12 +40,14 @@ MultExpression -> UnaryOpExpression | MultExpression mult_operator UnaryOpExpres
 AddExpression -> MultExpression | AddExpression add_operator MultExpression
 CompExpression -> AddExpression | CompExpression comp_operator AddExpression
 BinOpExpression -> CompExpression | BinOpExpression bin_operator CompExpression
-Expression -> BinOpExpression | FunctionDeclaration
+Expression -> BinOpExpression | FunctionDeclaration | ListComp
 
 #function declaration style that may be used within an expression.
 #not to be confused with FunctionDeclarationStatement, which cannot.
 FunctionDeclaration -> function( FunctionDeclarationArgumentList ) { StatementList } | function() { StatementList }
 FunctionDeclarationArgumentList -> IdentifierList
+
+ListComp -> [ Expression for identifier in Expression ]
 
 IdentifierList -> identifier | identifier , IdentifierList
 ExpressionList -> Expression | Expression , ExpressionList
