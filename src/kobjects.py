@@ -77,9 +77,6 @@ class ObjectFactory:
                 "__call__~": call_type_instance,
                 "__init__": create_type
             },
-            "Nonetype":{
-                #"__repr__": lambda obj: "None"
-            },
             "List":{
                 "size": lambda obj: len(obj["private"]["items"]),
                 "at~": lambda obj, idx: obj["private"]["items"][idx["private"]["value"]],
