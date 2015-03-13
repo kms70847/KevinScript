@@ -57,7 +57,8 @@ class ObjectFactory:
             },
             "String":{
                 "__init__": lambda obj: init_obj(obj, ""),
-                "__repr__": lambda obj: obj["private"]["value"]
+                "__repr__": lambda obj: obj["private"]["value"],
+                "__add__": lambda obj, other: obj["private"]["value"] + other["private"]["value"]
             },
             "Integer":{
                 "__init__": lambda obj: init_obj(obj, 0),
@@ -115,6 +116,7 @@ class ObjectFactory:
 
     def init_builtin_funcs(self):
         def print_(scopes, obj):
+            #import pdb; pdb.set_trace()
             method = self.get_attribute(obj, "__repr__")
             assert method, "{} object has no method __repr__".format(get_type_name(obj))
             result = self.eval_func(method, scopes, [])
@@ -127,8 +129,17 @@ class ObjectFactory:
                 return self.builtins["None"]
             else:
                 return print_(scopes, obj)
+        #used to edit the values in a type's `instance_methods` collection, which is otherwise inaccessible.
+        def override_method(scopes, type, method_name, func):
+            if "instance_methods" not in type["private"]:
+                #maybe we should raise an exception here?
+                return
+            method_name = method_name["private"]["value"]
+            type["private"]["instance_methods"][method_name] = func
+            return self.builtins["None"]
         self.builtins["print"] = self.make_Function(print_)
         self.builtins["print_single"] = self.make_Function(print_single)
+        self.builtins["override_method"] = self.make_Function(override_method)
 
     #functions of the form make_*** are used by the host language to construct 
     #object instances without having to invoke their type's `__call__` method.

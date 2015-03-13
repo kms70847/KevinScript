@@ -81,6 +81,9 @@ expect_output("print(True and False)", "False")
 expect_output("print(True or False)", "True")
 expect_runs("1 * 1 + 1 / 1 - 1 < 1")
 
+#string concatenation
+expect_output("""print("Hello" + " " + "World")""", "Hello World")
+
 #builtin type instantiation
 expect_output("print(Object())", "<Object instance>")
 expect_output("print(Integer())", "0")
