@@ -103,6 +103,17 @@ class NodeConstructor:
             expressions
         )
 
+    @staticmethod
+    #creates a function call node of the form `someExpression.method(args...)`
+    def make_method_call_expression_node(expression, name, arguments):
+        assert isinstance(name, str)
+        method_name = Leaf(lex.Token(lex.LiteralTokenRule("identifier"), name))
+        attribute_ref = Node("AttributeRef", [expression, method_name])
+        children = [attribute_ref]
+        if arguments:
+            children.append(Node("ExpressionList", arguments))
+        return Node("Call", children)
+
 def evaluate(node, scopes=None):
     if scopes == None:
         scopes = [builtins]
@@ -156,10 +167,16 @@ def evaluate(node, scopes=None):
             if isinstance(lhs, ast.Leaf):
                 scopes[-1][lhs.token.value] = evaluate(expression_node, scopes)
             # attribute assignment
-            else:
+            elif lhs.klass == "AttributeRef":
                 node = evaluate(lhs.children[0], scopes)
                 attribute_name = lhs.children[1].token.value
                 node["public"][attribute_name] = evaluate(expression_node, scopes)
+            #subscript assignment
+            else:
+                obj = lhs.children[0]
+                arguments = [lhs.children[1], expression_node]
+                node = NodeConstructor.make_method_call_expression_node(obj, "__setitem__", arguments)
+                evaluate(node, scopes)
             return statement_default_return_value
         elif node.klass == "ReturnStatement":
             value = evaluate(node.children[0], scopes)
@@ -180,9 +197,9 @@ def evaluate(node, scopes=None):
             identifier = node.children[0].token.value
             seq = evaluate(node.children[1], scopes)
             size_func = get_attribute(seq, "size")
-            at_func = get_attribute(seq, "at")
+            at_func = get_attribute(seq, "__getitem__")
             assert size_func, "Can't iterate over type {} with no `size` function".format(object_factory.get_type_name(seq))
-            assert at_func, "Can't iterate over type {} with no `at` function".format(object_factory.get_type_name(seq))
+            assert at_func, "Can't iterate over type {} with no `__getitem__` function".format(object_factory.get_type_name(seq))
             size = evaluate_function(size_func, scopes, [])["private"]["value"]
             for idx in range(size):
                 item = evaluate_function(at_func, scopes, [object_factory.make(idx)])
@@ -251,6 +268,11 @@ def evaluate(node, scopes=None):
             attr = get_attribute(obj, attribute_name)
             assert attr, "{} object has no attribute '{}'".format(object_factory.get_type_name(obj), attribute_name)
             return attr
+        # like AttributeRef above, this only gets evaluated for subscripts not in an AssignmentStatement.
+        elif node.klass == "Subscript":
+            obj = evaluate(node.children[0], scopes)
+            node = NodeConstructor.make_method_call_expression_node(node.children[0], "__getitem__", [node.children[1]])
+            return evaluate(node, scopes)
         elif node.klass == "Call":
             callable = evaluate(node.children[0], scopes)
             if len(node.children) == 1:

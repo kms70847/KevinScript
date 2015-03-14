@@ -93,6 +93,10 @@ expect_output("print(String())", "")
 expect_output("foo = Object(); foo.bar=23; print(foo.bar)", "23")
 expect_output("foo = Object(); foo.bar=function(){return 23;}; print(foo.bar())", "23")
 
+#subscript getting/setting
+expect_output("foo = [1,2,3]; print(foo[1]);", "2")
+expect_output("foo = [1,2,3]; foo[1] = 42; print(foo[1]);", "42")
+
 #while loops
 expect_runs("""
     i = 0;

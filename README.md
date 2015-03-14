@@ -77,19 +77,20 @@ Note that division rounds down to the nearest Integer.
 The List is the primary compound data type. It can be used to collect objects together.
 
     >>> seq = [4, 8, 15, 16, 23, 42];
-    >>> seq.at(0);
+    >>> seq[0];
     4
-    >>> seq.at(5);
+    >>> seq[5];
     42
     >>> seq.size();
     6
     >>> seq.append(100);
+    >>> seq[0] = 999;
     >>> seq;
-    [4, 8, 15, 16, 23, 42, 100]
+    [999, 8, 15, 16, 23, 42, 100]
     >>> seq.size();
     7
     >>> for(item in seq){print(item);}
-    4
+    999
     8
     15
     16

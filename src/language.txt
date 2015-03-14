@@ -11,7 +11,7 @@ Statement -> ExpressionStatement
 Statement -> ReturnStatement
 Statement -> EmptyStatement
 
-AssignmentStatement -> identifier = Expression ; | AttributeRef = Expression ;
+AssignmentStatement -> identifier = Expression ; | AttributeRef = Expression ; | Subscript = Expression ;
 WhileStatement -> while ( Expression ) { StatementList }
 ForStatement -> for ( identifier in Expression ) { StatementList }
 IfStatement -> if ( Expression ) { StatementList }
@@ -25,9 +25,10 @@ EmptyStatement -> ;
 Atom -> identifier | Literal | Enclosure
 Literal -> number | string_literal
 Enclosure -> ( Expression ) | ListDisplay | DictDisplay
-Primary -> Atom | Call | AttributeRef
+Primary -> Atom | Call | AttributeRef | Subscript
 Call -> Primary ( ExpressionList ) | Primary ( )
 AttributeRef -> Primary . identifier
+Subscript -> Primary [ Expression ]
 
 ListDisplay -> [ ] | [ ExpressionList ]
 DictDisplay -> { } | { KeyValueList }

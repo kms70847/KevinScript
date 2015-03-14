@@ -79,7 +79,8 @@ class ObjectFactory:
             },
             "List":{
                 "size": lambda obj: len(obj["private"]["items"]),
-                "at~": lambda obj, idx: obj["private"]["items"][idx["private"]["value"]],
+                "__getitem__~": lambda obj, idx: obj["private"]["items"][idx["private"]["value"]],
+                "__setitem__": lambda obj, idx, value: obj["private"]["items"].__setitem__(idx["private"]["value"], value),
                 "append": lambda obj, value: obj["private"]["items"].append(value)
             }
         }
