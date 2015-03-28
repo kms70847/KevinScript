@@ -129,7 +129,9 @@ Parameters needed to call type:
 - parent: the type that this type should inherit from. Use `Object` if you don't want anything in particular.
 - methods: a list of even length. Each even-indexed item is the string name of a method, and each odd-indexed item is the callable describing that method's behavior.
 
-    >>> Fred = Type("Fred", Object, ["durf", function(self){return 23;}]);
+For example,
+
+    >>> Fred = Type("Fred", Object, ["durf", function(self) {return 23;}]);
     >>> x = Fred();
     >>> x.durf();
     23
@@ -351,6 +353,7 @@ Used to create new lists by applying some expression to each element of an exist
 
 ## Calling Objects
 An expression can be called by adding a pair of parentheses, which may contain zero to infinity arguments. For example, `print` is a function that can be called with one argument.
+
     >>> print(23);
     23
 ## Attribute and Method Access
