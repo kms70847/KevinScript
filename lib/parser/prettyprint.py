@@ -1,5 +1,21 @@
-# prints nice grids. Example output:
+# prints nice grids. Sample usage:
 """
+>>> d = {
+...     (0, "("): "s1",
+...     (1, "("): "s1",
+...     (1, ")"): "s2",
+...     (2, "$"): "r2",
+...     (2, "("): "r2",
+...     (2, ")"): "r2",
+...     (3, "("): "s1",
+...     (4, ")"): "s5",
+...     (5, "$"): "r1",
+...     (5, "("): "r1",
+...     (5, ")"): "r1",
+...     (6, "$"): "acc"
+... }
+>>> print(prettyprint.dict_print(d))
+
 +---+-----+----+----+
 | X |   $ |  ( |  ) |
 +---+-----+----+----+
@@ -17,48 +33,56 @@
 +---+-----+----+----+
 | 6 | acc |    |    |
 +---+-----+----+----+
+
+>>> matrix = [
+...     ["1","2"],
+...     ["foo", "bar"]
+... ]
+>>> print(prettyprint.grid_print(matrix))
+
++---+---+
+|  1|  2|
++---+---+
+|foo|bar|
++---+---+
+
 """
 
+def dict_print(d):
+    """returns a printable representation of the dict, rendered as a grid."""
+    l = _grid_from_dict(d)
+    l = _grid_map(lambda x: " " + x + " ", l)
+    return grid_print(l)
 
-# adds spaces before string x until it is `width` characters long
-def _pad(x, width):
-    while len(x) < width:
-        x = " " + x
-    return x
-
-
-# like regular join, but the separator goes on the ends too.
-def _enclosed_join(separator, seq):
-    return separator + separator.join(seq) + separator
-
-
-# prints a sequence of items, each one _padded according to its given width.
-def _row_print(row, widths):
-    return _enclosed_join("|", [_pad(x[0], x[1]) for x in zip(row, widths)])
-
-
-# finds the widest element in one column of a grid
-def _max_width(grid, column):
-    return max(len(row[column]) for row in grid)
-
-
-# returns a printable grid representation
 def grid_print(grid):
+    """returns a printable grid representation of a 2-d list of strings."""
     widths = [_max_width(grid, x) for x in range(len(grid[0]))]
     row_separator = "\n" + _enclosed_join("+", ["-" * x for x in widths]) + "\n"
     return _enclosed_join(row_separator, [_row_print(row, widths) for row in grid])
 
+def _enclosed_join(separator, seq):
+    """like regular join, but the separator goes on the ends too."""
+    return separator + separator.join(seq) + separator
 
-# like map, but for 2d arrays.
+def _row_print(row, widths):
+    """prints a sequence of items, each one padded according to its given width."""
+    return _enclosed_join("|", [x[0].rjust(x[1]) for x in zip(row, widths)])
+
+def _max_width(grid, column):
+    """finds the widest element in one column of a grid."""
+    return max(len(row[column]) for row in grid)
+
 def _grid_map(func, grid):
+    """like map, but for 2d lists."""
     return [list(map(func, x)) for x in grid]
 
-
-# given a dict `d`, whose keys are 2 element tuples,
-# makes a grid with the keys as axes and the values as interior values.
-# ex. In the sample grid at the top of this page,
-# 0-6, $, (, ) are keys, and s1, r2, etc are values.
 def _grid_from_dict(d):
+    """
+    given a dict `d`, whose keys are 2 element tuples,
+    makes a grid with the keys as axes and the values as interior values.
+    ex. In the sample grid at the top of this page,
+    0-6, $, (, ) are keys, and s1, r2, etc are values.
+    """
     first_keys = list(set([x[0] for x in d]))
     second_keys = list(set([x[1] for x in d]))
     first_keys.sort()
@@ -73,10 +97,3 @@ def _grid_from_dict(d):
             row.append(d.get(key, ""))
         ret.append(row)
     return _grid_map(str, ret)
-
-
-# returns a printable representation of the dict, rendered as a grid.
-def dict_print(d):
-    l = _grid_from_dict(d)
-    l = _grid_map(lambda x: " " + x + " ", l)
-    return grid_print(l)
