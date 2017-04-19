@@ -39,7 +39,7 @@ class LiteralTokenRule(TokenRule):
 
 
 def gen_token_rules(text, rules):
-    from primitives import Terminal
+    from ks.parser.primitives import Terminal
     # identify terminal symbols in our language
     terminals = list(set(symbol.value for rule in rules for symbol in rule.RHS if isinstance(symbol, Terminal)))
 
@@ -78,6 +78,7 @@ class Token:
 
     def __repr__(self):
         return "Token({}, {}, {})".format(repr(self.klass.name), repr(self.value), self.position)
+
     def copy(self):
         return Token(self.klass, self.value, self.position)
 

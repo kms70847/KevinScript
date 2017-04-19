@@ -1,13 +1,5 @@
-import os
-import sys
-
-#add `src` directory to path
-cur_dir = os.path.dirname(os.path.abspath(__file__))
-top_dir = os.path.dirname(cur_dir)
-parser_dir = os.path.join(top_dir, "src")
-sys.path.insert(0, parser_dir)
-
 import ks
+
 
 def expect_runs(code):
     try:
@@ -16,6 +8,7 @@ def expect_runs(code):
         print("Expected code {} to run successfully, got exception {} instead".format(repr(code), repr(str(e))))
         raise
 
+
 def expect_output(code, output):
     try:
         result = ks.check_output(code)
@@ -23,6 +16,7 @@ def expect_output(code, output):
         print("Expected code {} to produce output {}, got exception {} instead".format(repr(code), repr(output), repr(str(e))))
         raise
     assert result == output, "Expected code {} to produce output {}, got {} instead".format(repr(code), repr(output), repr(result))
+
 
 expect_runs("")
 

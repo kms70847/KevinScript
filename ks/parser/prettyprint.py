@@ -48,11 +48,13 @@
 
 """
 
+
 def dict_print(d):
     """returns a printable representation of the dict, rendered as a grid."""
     l = _grid_from_dict(d)
     l = _grid_map(lambda x: " " + x + " ", l)
     return grid_print(l)
+
 
 def grid_print(grid):
     """returns a printable grid representation of a 2-d list of strings."""
@@ -60,21 +62,26 @@ def grid_print(grid):
     row_separator = "\n" + _enclosed_join("+", ["-" * x for x in widths]) + "\n"
     return _enclosed_join(row_separator, [_row_print(row, widths) for row in grid])
 
+
 def _enclosed_join(separator, seq):
     """like regular join, but the separator goes on the ends too."""
     return separator + separator.join(seq) + separator
+
 
 def _row_print(row, widths):
     """prints a sequence of items, each one padded according to its given width."""
     return _enclosed_join("|", [x[0].rjust(x[1]) for x in zip(row, widths)])
 
+
 def _max_width(grid, column):
     """finds the widest element in one column of a grid."""
     return max(len(row[column]) for row in grid)
 
+
 def _grid_map(func, grid):
     """like map, but for 2d lists."""
     return [list(map(func, x)) for x in grid]
+
 
 def _grid_from_dict(d):
     """

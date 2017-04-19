@@ -5,8 +5,7 @@
 
 # (looking back on this a year later, I'm confused about how the followset for a left derivation parser can be used in my right derivation parser.)
 
-from primitives import *
-from parseRules import parse_rules
+from ks.parser.primitives import *
 
 
 def sets_size(dict_of_sets):

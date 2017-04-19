@@ -1,6 +1,6 @@
-from util import construct_parser
-from parseRules import parse_rules
-from lex import lex, gen_token_rules, LiteralTokenRule
+from ks.parser.lex import LiteralTokenRule, gen_token_rules, lex
+from ks.parser.parseRules import parse_rules
+from ks.parser.util import construct_parser
 
 
 def slurp(filename):

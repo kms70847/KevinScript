@@ -4,10 +4,9 @@
 # "[SLR is] capable of constructing reduce actions that do not occupy entire rows. Therefore, they are capable of parsing more grammars than LR(0) parsers."
 # in practice, this merely requires slightly more work in step four of the `action_table` method.
 
-from primitives import *
-from parseRules import parse_rules
-from followset import follow_sets
-from prettyprint import dict_print
+from ks.parser.followset import follow_sets
+from ks.parser.prettyprint import dict_print
+from ks.parser.primitives import *
 
 
 def multi_dict(seq, key_func):
