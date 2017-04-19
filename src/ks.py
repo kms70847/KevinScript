@@ -15,6 +15,11 @@ import ast
 import parserExceptions
 from eval_ast import evaluate, NodeConstructor
 
+try:
+    input = raw_input
+except:
+    pass
+
 reducible_nodes = ["StatementList", "ExpressionList", "IdentifierList", "KeyValueList", "FunctionDeclarationStatementList"]
 
 base_compile = ast.get_compiler(
@@ -85,7 +90,7 @@ def repl():
     print(">>>", end = " ")
     while True:
         try:
-            line = raw_input("")
+            line = input("")
         except (EOFError, KeyboardInterrupt):
             return
         data += line
