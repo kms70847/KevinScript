@@ -1,4 +1,4 @@
-from kobjects import ObjectFactory
+from ks.kobjects import ObjectFactory
 from ks.parser import ast, lex
 from ks.parser.ast import Leaf, Node
 
