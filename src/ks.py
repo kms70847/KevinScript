@@ -1,7 +1,12 @@
+from __future__ import print_function
 # ugly stuff to import modules one directory up
 import os
 import sys
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 top_dir = os.path.dirname(cur_dir)
 parser_dir = os.path.join(top_dir, "lib", "parser")
@@ -35,7 +40,7 @@ def execute(program_text, strict=False, mode="exec"):
     tree = compile(program_text, strict)
     if mode == "single":
         #primarily used by the REPL. if the final statement in the program is an expression that doesn't evaluate to None, print its result.
-        #print "entering pdb..."
+        #print("entering pdb...")
         #import pdb; pdb.set_trace()
         assert tree.klass == "StatementList"
         last_statement = tree.children[-1].children[0]
@@ -57,7 +62,7 @@ def check_output(*args, **kargs):
                 channel.write(data)
 
     verbose = kargs.pop("verbose", True)
-    string_io = StringIO.StringIO()
+    string_io = StringIO()
     old_stdout = sys.stdout
 
     if verbose:
@@ -77,7 +82,7 @@ def repl():
     def isEofException(ex):
         return isinstance(ex, parserExceptions.NoActionFoundError) and ex.token.klass.name == "$"
     data = ""
-    print ">>>",
+    print(">>>", end = " ")
     while True:
         try:
             line = raw_input("")
@@ -89,12 +94,12 @@ def repl():
             execute(data, strict=bool(line), mode="single")
         except Exception as ex:
             if isEofException(ex):
-                print "...",
+                print("...", end = " ")
                 continue
             else:
-                print ex
+                print(ex)
         data = ""
-        print ">>>",
+        print(">>>", end = " ")
 
 with open(os.path.join(cur_dir, "native_builtin_initialization.k")) as file:
     execute(file.read())

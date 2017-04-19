@@ -286,7 +286,7 @@ def evaluate(node, scopes=None):
             try:
                 return evaluate_function(callable, scopes, arguments)
             except:
-                print "Couldn't call function on line {}".format(line(node))
+                print("Couldn't call function on line {}".format(line(node)))
                 raise
         elif node.klass == "ExpressionList":
             return [evaluate(child, scopes) for child in node.children]

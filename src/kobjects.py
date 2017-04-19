@@ -65,7 +65,7 @@ class ObjectFactory:
                 "__add__" : lambda obj, other: obj["private"]["value"] + other["private"]["value"],
                 "__sub__" : lambda obj, other: obj["private"]["value"] - other["private"]["value"],
                 "__mul__" : lambda obj, other: obj["private"]["value"] * other["private"]["value"],
-                "__div__" : lambda obj, other: obj["private"]["value"] / other["private"]["value"],
+                "__div__" : lambda obj, other: obj["private"]["value"] // other["private"]["value"],
                 "__mod__" : lambda obj, other: obj["private"]["value"] % other["private"]["value"],
                 "__neg__" : lambda obj: -obj["private"]["value"],
                 "__pos__" : lambda obj: +obj["private"]["value"],
@@ -97,8 +97,8 @@ class ObjectFactory:
             native_func = self.make_Function(func)
             self.builtins[type]["private"]["instance_methods"][method_name] = native_func
 
-        for type, methods in instance_methods.iteritems():
-            for method_name, host_func in methods.iteritems():
+        for type, methods in instance_methods.items():
+            for method_name, host_func in methods.items():
                 register_method(type, method_name, host_func)
 
         self.init_builtin_funcs()
@@ -185,7 +185,7 @@ class ObjectFactory:
 
         #some types are just simple wrappers around host objects, with the value stored in the private dict.
         d = {str: "String", int: "Integer"}
-        for host_type, native_type in d.iteritems():
+        for host_type, native_type in d.items():
             if isinstance(value, host_type):
                 obj = self.make_Object(native_type)
                 obj["private"]["value"] = value

@@ -13,14 +13,14 @@ def expect_runs(code):
     try:
         ks.execute(code)
     except Exception as e:
-        print "Expected code {} to run successfully, got exception {} instead".format(repr(code), repr(str(e)))
+        print("Expected code {} to run successfully, got exception {} instead".format(repr(code), repr(str(e))))
         raise
 
 def expect_output(code, output):
     try:
         result = ks.check_output(code)
     except Exception as e:
-        print "Expected code {} to produce output {}, got exception {} instead".format(repr(code), repr(output), repr(str(e)))
+        print("Expected code {} to produce output {}, got exception {} instead".format(repr(code), repr(output), repr(str(e))))
         raise
     assert result == output, "Expected code {} to produce output {}, got {} instead".format(repr(code), repr(output), repr(result))
 
@@ -31,7 +31,7 @@ expect_output('print("Hello, World!")', 'Hello, World!')
 expect_output('print(123)', '123')
 expect_output('print(True)', 'True')
 expect_output('print(False)', 'False')
-print "skipping tests for list output until support for native builtin methods is available"
+print("skipping tests for list output until support for native builtin methods is available")
 #expect_output('print [1, 2, 3]', '[1, 2, 3]')
 #expect_output('print [1, [2, [3]]]', '[1, [2, [3]]]')
 expect_output('print(None)', 'None')
