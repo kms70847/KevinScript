@@ -1,6 +1,5 @@
 #kobjects.py - a replacement for the to-be-deprecated ktypes.py
 
-import operator
 
 class ObjectFactory:
     """arguments:
@@ -130,7 +129,7 @@ class ObjectFactory:
         self.builtins["print_single"] = self.make_Function(print_single)
         self.builtins["override_method"] = self.make_Function(override_method)
 
-    #functions of the form make_*** are used by the host language to construct 
+    #functions of the form make_*** are used by the host language to construct
     #object instances without having to invoke their type's `__call__` method.
 
     #creates a nested dict which acts as the basis of all actual KS objects.
@@ -208,11 +207,11 @@ class ObjectFactory:
             arg_names = func["private"]["arguments"]
             body = lambda closure, *args: self.eval_func(func, None, (obj,) + args)
             return self.make_Function(body, arg_names[1:])
-            
+
         #see if the attribute is directly on the object
         if name in obj["public"]:
             return obj["public"][name]
-        
+
         #see if the attribute is an instance method on the object's type chain
         for type in iter_types(obj["public"]["type"]):
             if "instance_methods" not in type["private"]:
@@ -224,7 +223,7 @@ class ObjectFactory:
 
         #Couldn't find the attribute!
         return None
-            
+
     def has_attribute(self, obj, name):
         return self.get_attribute(obj, name) is not None
 

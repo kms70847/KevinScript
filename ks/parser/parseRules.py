@@ -8,8 +8,7 @@ Expression -> Binary
 Binary -> 0
 Binary -> 1"""
 
-
-from primitives import *
+from ks.parser.primitives import *
 
 
 def parse_rules(rule_text):

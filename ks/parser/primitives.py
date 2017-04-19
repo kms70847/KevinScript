@@ -43,7 +43,7 @@ class Terminal:
 class Rule:
     def __init__(self, LHS, RHS):
         if LHS.symbol_type != NonTerminal.symbol_type:
-            raise Error("Expected terminal symbol")
+            raise Exception("Expected terminal symbol")
         self.LHS = LHS
         self.RHS = RHS
 

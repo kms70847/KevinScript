@@ -1,7 +1,7 @@
-import lex
-import ast
-from ast import Node, Leaf
 from kobjects import ObjectFactory
+from ks.parser import ast, lex
+from ks.parser.ast import Leaf, Node
+
 
 def extract_identifiers(node):
     if isinstance(node, ast.Leaf):
@@ -14,6 +14,7 @@ def extract_identifiers(node):
         for child in node.children:
             ret = ret + extract_identifiers(child)
         return ret
+
 
 def evaluate_function(func, scopes=None, argument_values=None):
     if scopes == None:
@@ -31,13 +32,14 @@ def evaluate_function(func, scopes=None, argument_values=None):
             value = argument_values[i]
             locals[name] = value
         result = evaluate(
-            func["private"]["body"], 
+            func["private"]["body"],
             func["private"]["closure"] + [locals]
         )
         return result["value"]
     else:
         #external code func
         return func["private"]["body"](scopes, *argument_values)
+
 
 #static class containing methods that are useful in transforming the AST.
 class NodeConstructor:
@@ -77,7 +79,7 @@ class NodeConstructor:
     @staticmethod
     def make_type_call_node(class_name, parent_name, function_names, function_nodes):
         type_class_identifier = lex.Token(lex.LiteralTokenRule("identifier"), "Type")
-        if parent_name is None: 
+        if parent_name is None:
             parent_name = lex.Token(lex.LiteralTokenRule("identifier"), "Object")
         list_literal_contents = []
         for function_name, function_node in zip(function_names, function_nodes):
@@ -113,6 +115,7 @@ class NodeConstructor:
         if arguments:
             children.append(Node("ExpressionList", arguments))
         return Node("Call", children)
+
 
 def evaluate(node, scopes=None):
     if scopes == None:
@@ -332,6 +335,7 @@ def evaluate(node, scopes=None):
             return object_factory.make(result)
         else:
             raise Exception("evaluate not implemented yet for node {}".format(node.klass))
+
 
 object_factory = ObjectFactory(evaluate_function)
 builtins = object_factory.builtins

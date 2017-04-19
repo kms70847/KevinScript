@@ -1,8 +1,8 @@
 # table.py: see http://en.wikipedia.org/wiki/LR_parser
 # converts a context-free grammar definition into an action/goto table, suitable for passing to an LR parser.
-from primitives import *
-from parseRules import parse_rules
-from prettyprint import dict_print
+
+from ks.parser.prettyprint import dict_print
+from ks.parser.primitives import *
 
 
 def multi_dict(seq, key_func):

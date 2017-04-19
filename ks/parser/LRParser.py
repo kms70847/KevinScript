@@ -1,12 +1,12 @@
 # LRParser: see http://en.wikipedia.org/wiki/LR_parser
 # takes a action+goto table and generates a rightmost derivation of a string within the language family.
 
-from primitives import *
-from parseRules import *
-from lex import LiteralTokenRule, Token
-from parserExceptions import NoActionFoundError
+from ks.parser.lex import LiteralTokenRule, Token
+from ks.parser.parseRules import *
+from ks.parser.parserExceptions import NoActionFoundError
 
 end_of_input_token = Token(LiteralTokenRule("$"), "$")
+
 
 # rules is a list of Rule objects.
 # actions is a dict whose key is a tuple of state and input symbol (int and string), and whose value is an Action object.

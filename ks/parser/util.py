@@ -1,6 +1,6 @@
-from parseRules import parse_rules
-from SLRtable import ParseTable
-from LRParser import LRParser
+from ks.parser.LRParser import LRParser
+from ks.parser.SLRtable import ParseTable
+from ks.parser.parseRules import parse_rules
 
 
 def construct_parser(rules_text, is_verbose=False):
