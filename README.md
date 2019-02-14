@@ -376,6 +376,7 @@ The attributes and methods of an object can be accessed using the period operato
     23
 ## Item Access
 Some objects, such as List, support indexed item access.
+
     >>> x = [4, 8, 15, 16, 23, 42];
     >>> x[1] = 99;
     >>> print(x);
