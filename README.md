@@ -3,19 +3,21 @@ KevinScript (abbreviated "KS") is a programming language inspired by Python and 
 
 # Quick Start
 ## Installation
-KS requires Python to run. Other than that, there are no special installation requirements - just download and execute.
-## Starting the REPL
-You can experiment with KS right away by using the REPL. Execute `src/ks.py` with no arguments.
+KS requires Python to run.
+Download this repository to a directory of your choosing. For example, `C:\programming\Github projects\KevinScript`.
 
-    C:\programming\Github projects\KevinScript>src\ks.py
+## Starting the REPL
+You can experiment with KS right away by using the REPL. Execute `python -m ks` with no arguments.
+
+    C:\programming\Github projects\KevinScript>python -m ks
     >>> print("Hello, world!")
     ...
     Hello, world!
 Exit the REPL with ctrl-C or ctrl-Z.
 ## Running source files
-You can execute KS source files by supplying a file name to `src/ks.py`.
+You can execute KS source files by supplying a file name to `python -m ks`.
 
-    C:\programming\Github projects\KevinScript>src\ks.py samples\prime_detector.k
+    C:\programming\Github projects\KevinScript>python -m ks samples\prime_detector.k
     Prime numbers below 100:
     2
     3
@@ -42,6 +44,15 @@ You can execute KS source files by supplying a file name to `src/ks.py`.
     83
     89
     97
+
+## Installing as a package
+
+Optionally, you may install KevinScript as a package. This will make it accessible from any directory. 
+From the KevinScript directory, execute:
+
+    python setup.py install
+
+Now you can access KevinScript by using `KevinScript` instead of `python -m ks`.
 
 # Built-in Types
 ## Boolean
@@ -389,7 +400,7 @@ Compiled KevinScript - compiles KS to C, which can then be compiled into an exec
 Please submit bug reports and feature requests on the Github Issues page. QA and Design eagerly await your feedback!  
 We are not actively seeking code contributions at this time.
 
-#Credits
+# Credits
 Concept - Kevin  
 Design - Kevin  
 Development - Kevin  
