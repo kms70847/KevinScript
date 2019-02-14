@@ -374,6 +374,20 @@ The attributes and methods of an object can be accessed using the period operato
     >>> x.foo = 23;
     >>> x.foo;
     23
+## Item Access
+Some objects, such as List, support indexed item access.
+    >>> x = [4, 8, 15, 16, 23, 42];
+    >>> x[1] = 99;
+    >>> print(x);
+    [4, 99, 15, 16, 23, 42]
+    >>> print(x[1]);
+    99
+
+Define this behavior in your own types by defining:
+
+ - item getting - `__getitem__(self, key)`  
+ - item setting - `__setitem__(self, key, value)`
+
 ## Atom Expression
 An atom expression is one of three things:
 
