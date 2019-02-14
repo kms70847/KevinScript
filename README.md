@@ -83,7 +83,12 @@ An Integer is represented by a sequence of digits. Like in most other languages,
     5
     >>> 15 % 2;
     1
-Note that division rounds down to the nearest Integer.
+Note that if division would result in a non-integer, the operator rounds downwards.
+
+    >>> 3/2;
+    1
+    >>> -3/2;
+    -2
 ## List
 The List is the primary compound data type. It can be used to collect objects together.
 
