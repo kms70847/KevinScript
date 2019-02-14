@@ -1,3 +1,5 @@
 *.pyc
 KevinScript.egg-info
 .idea
+build
+dist
